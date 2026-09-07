@@ -1,19 +1,24 @@
 import { useState } from 'react'
-import { Check, ChevronDown, Menu, Sparkles } from 'lucide-react'
+import { Check, ChevronDown, Menu, Sparkles, Zap } from 'lucide-react'
 import { toast } from 'sonner'
 import { cn } from '@/lib/utils'
 import api from '@/lib/api-client'
-import { AMI_PROVIDERS } from '../../hooks/useAmiChat'
+import { AMI_PROVIDERS, type SessionTotals } from '../../hooks/useAmiChat'
 
 interface AmiHeaderProps {
   provider: string
   onProvider: (value: string) => void
   userName: string | null
+  totals: SessionTotals
   onMenu: () => void
   onLogout: () => void
 }
 
-export default function AmiHeader({ provider, onProvider, userName, onMenu, onLogout }: AmiHeaderProps) {
+function formatIdr(value: number): string {
+  return 'Rp' + value.toLocaleString('id-ID', { maximumFractionDigits: 2 })
+}
+
+export default function AmiHeader({ provider, onProvider, userName, totals, onMenu, onLogout }: AmiHeaderProps) {
   const [open, setOpen] = useState(false)
   const [userOpen, setUserOpen] = useState(false)
   const [passOpen, setPassOpen] = useState(false)
@@ -90,6 +95,20 @@ export default function AmiHeader({ provider, onProvider, userName, onMenu, onLo
       </div>
 
       <div className="flex-1" />
+
+      {totals.tokens > 0 && (
+        <span
+          className="mr-1 hidden items-center gap-1 text-[11px] text-[#9aa0a6] sm:flex"
+          title={
+            totals.hasPricing
+              ? `In ${totals.prompt.toLocaleString()} · Out ${totals.completion.toLocaleString()} · Estimasi biaya sesi ini`
+              : 'Tarif belum diset di pengaturan AI'
+          }
+        >
+          <Zap className="h-3 w-3" />↑{totals.prompt.toLocaleString()} ↓{totals.completion.toLocaleString()}
+          {totals.hasPricing && <span className="font-semibold text-[#e3e3e3]">· {formatIdr(totals.cost)}</span>}
+        </span>
+      )}
 
       {/* avatar */}
       <div className="relative">

@@ -18,6 +18,9 @@ export interface AmiMessage {
   prompt_tokens?: number | null
   completion_tokens?: number | null
   cost_idr?: number | null
+  instant?: boolean
+  cached?: boolean
+  model?: string
 }
 
 export interface AmiSession {
@@ -34,6 +37,7 @@ interface ChatResponse {
   session_id: number
   model?: string
   cached?: boolean
+  instant?: boolean
   tool_calls?: AmiToolCall[]
   message?: string
   cost_idr?: number | null
@@ -110,6 +114,14 @@ export function suggestFollowUps(content: string): string[] {
   if (/\|.*\|/.test(content)) out.push('Ekspor ringkasan ini')
   if (out.length === 0) out.push('Jelaskan lebih detail', 'Beri ringkasan singkat')
   return out.slice(0, 3)
+}
+
+export interface SessionTotals {
+  tokens: number
+  prompt: number
+  completion: number
+  cost: number
+  hasPricing: boolean
 }
 
 export function useAmiChat() {
@@ -334,6 +346,9 @@ export function useAmiChat() {
                 prompt_tokens: event.prompt_tokens ?? null,
                 completion_tokens: event.completion_tokens ?? null,
                 cost_idr: event.cost_idr ?? null,
+                instant: event.instant ?? false,
+                cached: event.cached ?? false,
+                model: event.model,
               }
             }
             return next
@@ -360,7 +375,18 @@ export function useAmiChat() {
             const next = [...prev]
             const last = next.length - 1
             if (last >= 0 && next[last].role === 'assistant') {
-              next[last] = { ...next[last], content: fallback.reply, tool_calls: fallback.tool_calls }
+              next[last] = {
+                ...next[last],
+                content: fallback.reply,
+                tool_calls: fallback.tool_calls,
+                tokens_used: fallback.usage?.total_tokens,
+                prompt_tokens: fallback.prompt_tokens ?? fallback.usage?.prompt_tokens ?? null,
+                completion_tokens: fallback.completion_tokens ?? fallback.usage?.completion_tokens ?? null,
+                cost_idr: fallback.cost_idr ?? null,
+                instant: (fallback as ChatResponse).instant ?? false,
+                cached: fallback.cached ?? false,
+                model: fallback.model,
+              }
             }
             return next
           })
@@ -409,11 +435,27 @@ export function useAmiChat() {
     handleSend(lastUser.content)
   }, [isLoading, messages, handleSend])
 
+  const totals: SessionTotals = messages.reduce<SessionTotals>(
+    (acc, m) => {
+      if (m.role !== 'assistant') return acc
+      const total = m.tokens_used ?? (m.prompt_tokens ?? 0) + (m.completion_tokens ?? 0)
+      return {
+        tokens: acc.tokens + total,
+        prompt: acc.prompt + (m.prompt_tokens ?? 0),
+        completion: acc.completion + (m.completion_tokens ?? 0),
+        cost: acc.cost + (m.cost_idr ?? 0),
+        hasPricing: acc.hasPricing || m.cost_idr != null,
+      }
+    },
+    { tokens: 0, prompt: 0, completion: 0, cost: 0, hasPricing: false as boolean },
+  )
+
   return {
     messages,
     input,
     setInput,
     isLoading,
+    totals,
     sessions,
     activeSessionId,
     loadingSessions,

@@ -13,6 +13,7 @@ import {
   ThumbsDown,
   ThumbsUp,
   Wrench,
+  Zap,
 } from 'lucide-react'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
@@ -200,6 +201,36 @@ function CodeBlock({ code, lang }: { code: string; lang?: string }) {
   )
 }
 
+function formatIdr(value: number): string {
+  return 'Rp' + value.toLocaleString('id-ID', { maximumFractionDigits: 2 })
+}
+
+function UsageBadge({ msg }: { msg: AmiMessage }) {
+  const total = msg.tokens_used ?? (msg.prompt_tokens ?? 0) + (msg.completion_tokens ?? 0)
+  const show = msg.instant || total > 0 || msg.cost_idr != null || msg.cached
+  if (!show) return null
+  return (
+    <p className="mt-1.5 flex flex-wrap items-center gap-1.5 text-[11px] text-[#9aa0a6]">
+      {msg.instant ? (
+        <span
+          title="Jawaban langsung dari database — 0 token, tanpa AI"
+          className="inline-flex items-center gap-1 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-2 py-0.5 font-medium text-emerald-400"
+        >
+          <Zap className="h-3 w-3" />
+          Instan · 0 token
+        </span>
+      ) : (
+        <span title={`In ${msg.prompt_tokens ?? 0} · Out ${msg.completion_tokens ?? 0}`}>
+          ↑{(msg.prompt_tokens ?? total).toLocaleString()} ↓{(msg.completion_tokens ?? 0).toLocaleString()}
+        </span>
+      )}
+      {msg.cost_idr != null && !msg.instant && <span>· {formatIdr(msg.cost_idr)}</span>}
+      {msg.cached && !msg.instant && <span>· cached</span>}
+      {msg.model && !msg.instant && <span>· {msg.model.split('/').pop()}</span>}
+    </p>
+  )
+}
+
 function ModelBubble({
   msg,
   chat,
@@ -307,6 +338,7 @@ function ModelBubble({
             {msg.tool_calls.length} sumber data: {msg.tool_calls.map((t) => t.function.name.replaceAll('_', ' ')).join(', ')}
           </p>
         )}
+        <UsageBadge msg={msg} />
 
         {msg.content && !chat.isLoading && (
           <div className="mt-1 flex items-center gap-0.5 opacity-100 transition-opacity md:opacity-0 md:group-hover:opacity-100 md:focus-within:opacity-100">

@@ -53,6 +53,7 @@ export default function AmiShell() {
           provider={chat.provider}
           onProvider={chat.setProvider}
           userName={chat.userName}
+          totals={chat.totals}
           onMenu={() => setSidebarOpen(true)}
           onLogout={logout}
         />
