@@ -67,8 +67,9 @@
 @theme inline {
     --font-google-sans: 'Google Sans', 'sans-serif';
     --font-open-sans: 'Open Sans', 'sans-serif';
-    --font-sans: 'Open Sans', 'sans-serif';
-    --font-heading: 'Google Sans', 'sans-serif';
+    --font-sans: 'Google Sans Text', 'Google Sans', 'Open Sans', 'sans-serif';
+    --font-heading: 'Google Sans Display', 'Google Sans', 'sans-serif';
+    --font-code: 'Google Sans Code', ui-monospace, 'monospace';
 
     --radius-sm: calc(var(--radius) - 4px);
     --radius-md: calc(var(--radius) - 2px);

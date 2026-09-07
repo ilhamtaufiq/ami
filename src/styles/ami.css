@@ -2,6 +2,21 @@
 
 .ami-dark {
   color-scheme: dark;
+  font-family: 'Google Sans Text', 'Google Sans', 'Open Sans', sans-serif;
+}
+
+.ami-dark h1,
+.ami-dark h2,
+.ami-dark h3,
+.ami-dark .font-heading {
+  font-family: 'Google Sans Display', 'Google Sans', sans-serif;
+}
+
+.ami-dark code,
+.ami-dark pre,
+.ami-dark .font-code,
+.ami-dark .tabular-nums {
+  font-family: 'Google Sans Code', ui-monospace, monospace;
 }
 
 .ami-gradient-text {
