@@ -1,77 +1,45 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { Toaster, toast } from 'sonner'
+import { Loader2 } from 'lucide-react'
 import AmiShell from './features/chat/components/ami/AmiShell'
 import { onUnauthorized, setToken } from './lib/api-client'
+import {
+  amiLoginUrl,
+  bunSignInUrl,
+  cleanHandoffFromUrl,
+  exchangeHandoffCode,
+  getHandoffCode,
+} from './lib/sso'
 
 const queryClient = new QueryClient()
 
-function LoginForm({ onDone }: { onDone: () => void }) {
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
-
-  async function submit(e: React.FormEvent) {
-    e.preventDefault()
-    setLoading(true)
-    setError(null)
-    try {
-      const base = (import.meta.env.VITE_APIAMIS_BASE_URL ?? 'http://apiamis.test/api').replace(/\/$/, '')
-      const res = await fetch(`${base}/auth/login`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-        body: JSON.stringify({ email, password }),
-      })
-      const payload = await res.json().catch(() => null)
-      if (!res.ok) throw new Error(payload?.message || 'Login gagal')
-      const token = payload?.token ?? payload?.data?.token
-      if (!token) throw new Error('Token tidak ditemukan di respons login')
-      setToken(token)
-      onDone()
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Login gagal')
-    } finally {
-      setLoading(false)
-    }
-  }
-
+function LoginScreen({ error }: { error: string | null }) {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background p-4">
-      <form onSubmit={submit} className="w-full max-w-sm space-y-4 rounded-xl border p-6">
-        <h1 className="text-xl font-semibold">AMI Asisten AI</h1>
-        <p className="text-sm text-muted-foreground">Masuk dengan akun arumanis.</p>
-        <input
-          className="w-full rounded-md border px-3 py-2 text-sm"
-          type="email"
-          placeholder="Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          required
-        />
-        <input
-          className="w-full rounded-md border px-3 py-2 text-sm"
-          type="password"
-          placeholder="Password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          required
-        />
-        {error && <p className="text-sm text-red-600">{error}</p>}
+    <div className="ami-dark flex min-h-screen items-center justify-center bg-[#131314] p-4">
+      <div className="w-full max-w-sm space-y-4 rounded-3xl bg-[#1e1f20] p-8 text-center">
+        <h1 className="ami-gradient-text text-3xl font-medium">AMI Asisten</h1>
+        <p className="text-sm text-[#9aa0a6]">
+          Masuk lewat portal Arumanis — tanpa password tambahan di sini.
+        </p>
+        {error && <p className="text-sm text-[#f28b82]">{error}</p>}
         <button
-          type="submit"
-          disabled={loading}
-          className="w-full rounded-md bg-primary px-3 py-2 text-sm font-medium text-primary-foreground disabled:opacity-50"
+          type="button"
+          onClick={() => window.location.replace(bunSignInUrl(amiLoginUrl()))}
+          className="w-full rounded-full bg-[#e3e3e3] px-3 py-2.5 text-sm font-medium text-[#131314] transition-transform hover:scale-[1.02]"
         >
-          {loading ? 'Masuk...' : 'Masuk'}
+          Masuk via Arumanis
         </button>
-      </form>
+      </div>
     </div>
   )
 }
 
 export default function App() {
   const [authed, setAuthed] = useState(() => !!localStorage.getItem('ami-token'))
+  const [booting, setBooting] = useState(() => getHandoffCode() != null)
+  const [ssoError, setSsoError] = useState<string | null>(null)
+  const exchangedRef = useRef(false)
 
   useEffect(() => {
     onUnauthorized(() => {
@@ -81,9 +49,37 @@ export default function App() {
     })
   }, [])
 
+  // SSO bootstrap: ?code=… dari bun → tukar token → bersih dari URL.
+  useEffect(() => {
+    const code = getHandoffCode()
+    if (!code || exchangedRef.current) return
+    exchangedRef.current = true
+    exchangeHandoffCode(code)
+      .then((token) => {
+        setToken(token)
+        setAuthed(true)
+        setSsoError(null)
+        cleanHandoffFromUrl()
+      })
+      .catch((err) => {
+        setSsoError(err instanceof Error ? err.message : 'SSO gagal')
+        cleanHandoffFromUrl()
+      })
+      .finally(() => setBooting(false))
+  }, [])
+
+  if (booting) {
+    return (
+      <div className="ami-dark flex min-h-screen items-center justify-center gap-3 bg-[#131314] text-sm text-[#9aa0a6]">
+        <Loader2 className="h-5 w-5 animate-spin" />
+        Memeriksa sesi Arumanis…
+      </div>
+    )
+  }
+
   return (
     <QueryClientProvider client={queryClient}>
-      {authed ? <AmiShell /> : <LoginForm onDone={() => setAuthed(true)} />}
+      {authed ? <AmiShell /> : <LoginScreen error={ssoError} />}
       <Toaster richColors position="top-center" />
     </QueryClientProvider>
   )

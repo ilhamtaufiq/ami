@@ -5,6 +5,7 @@ import AmiHeader from './AmiHeader'
 import AmiFeed from './AmiFeed'
 import AmiComposer from './AmiComposer'
 import { setToken } from '@/lib/api-client'
+import { bunSignInUrl } from '@/lib/sso'
 
 const ChatFotoUploadDialog = lazy(() => import('../ChatFotoUpload'))
 
@@ -19,7 +20,7 @@ export default function AmiShell() {
   const logout = () => {
     setToken(null)
     localStorage.removeItem('ami_provider')
-    window.location.reload()
+    window.location.replace(bunSignInUrl())
   }
 
   const selectSession = (id: number) => {
