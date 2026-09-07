@@ -1,0 +1,193 @@
+:root {
+    --radius: 0.625rem;
+    --background: oklch(1 0 0);
+    --foreground: oklch(0.129 0.042 264.695);
+    --card: oklch(1 0 0);
+    --card-foreground: oklch(0.129 0.042 264.695);
+    --popover: oklch(1 0 0);
+    --popover-foreground: oklch(0.129 0.042 264.695);
+    --primary: oklch(0.208 0.042 265.755);
+    --primary-foreground: oklch(0.984 0.003 247.858);
+    --secondary: oklch(0.968 0.007 247.896);
+    --secondary-foreground: oklch(0.208 0.042 265.755);
+    --muted: oklch(0.968 0.007 247.896);
+    --muted-foreground: oklch(0.554 0.046 257.417);
+    --accent: oklch(0.968 0.007 247.896);
+    --accent-foreground: oklch(0.208 0.042 265.755);
+    --destructive: oklch(0.577 0.245 27.325);
+    --border: oklch(0.929 0.013 255.508);
+    --input: oklch(0.929 0.013 255.508);
+    --ring: oklch(0.704 0.04 256.788);
+    --chart-1: oklch(0.575 0.163 255.532);
+    --chart-2: oklch(0.671 0.175 40.642);
+    --chart-3: oklch(0.669 0.141 162.111);
+    --chart-4: oklch(0.764 0.161 75.116);
+    --chart-5: oklch(0.716 0.141 357.389);
+    --headline: #1A1A1B;
+    --body-text: #3C4043;
+
+    --sidebar: var(--background);
+    --sidebar-foreground: var(--foreground);
+    --sidebar-primary: var(--primary);
+    --sidebar-primary-foreground: var(--primary-foreground);
+    --sidebar-accent: var(--accent);
+    --sidebar-accent-foreground: var(--accent-foreground);
+    --sidebar-border: var(--border);
+    --sidebar-ring: var(--ring);
+}
+
+.dark {
+    --background: oklch(0.129 0.042 264.695);
+    --foreground: oklch(0.984 0.003 247.858);
+    --card: oklch(0.14 0.04 259.21);
+    --card-foreground: oklch(0.984 0.003 247.858);
+    --popover: oklch(0.208 0.042 265.755);
+    --popover-foreground: oklch(0.984 0.003 247.858);
+    --primary: oklch(0.929 0.013 255.508);
+    --primary-foreground: oklch(0.208 0.042 265.755);
+    --secondary: oklch(0.279 0.041 260.031);
+    --secondary-foreground: oklch(0.984 0.003 247.858);
+    --muted: oklch(0.279 0.041 260.031);
+    --muted-foreground: oklch(0.704 0.04 256.788);
+    --accent: oklch(0.279 0.041 260.031);
+    --accent-foreground: oklch(0.984 0.003 247.858);
+    --destructive: oklch(0.704 0.191 22.216);
+    --border: oklch(1 0 0 / 10%);
+    --input: oklch(1 0 0 / 15%);
+    --ring: oklch(0.551 0.027 264.364);
+    --chart-1: oklch(0.622 0.161 255.053);
+    --chart-2: oklch(0.622 0.173 40.112);
+    --chart-3: oklch(0.621 0.128 163.115);
+    --chart-4: oklch(0.670 0.143 73.227);
+    --chart-5: oklch(0.622 0.171 0.838);
+    --headline: oklch(0.984 0.003 247.858);
+    --body-text: oklch(0.9 0.01 247);
+}
+
+@theme inline {
+    --font-google-sans: 'Google Sans', 'sans-serif';
+    --font-open-sans: 'Open Sans', 'sans-serif';
+    --font-sans: 'Open Sans', 'sans-serif';
+    --font-heading: 'Google Sans', 'sans-serif';
+
+    --radius-sm: calc(var(--radius) - 4px);
+    --radius-md: calc(var(--radius) - 2px);
+    --radius-lg: var(--radius);
+    --radius-xl: calc(var(--radius) + 4px);
+    --color-background: var(--background);
+    --color-foreground: var(--foreground);
+    --color-card: var(--card);
+    --color-card-foreground: var(--card-foreground);
+    --color-popover: var(--popover);
+    --color-popover-foreground: var(--popover-foreground);
+    --color-primary: var(--primary);
+    --color-primary-foreground: var(--primary-foreground);
+    --color-secondary: var(--secondary);
+    --color-secondary-foreground: var(--secondary-foreground);
+    --color-muted: var(--muted);
+    --color-muted-foreground: var(--muted-foreground);
+    --color-accent: var(--accent);
+    --color-accent-foreground: var(--accent-foreground);
+    --color-destructive: var(--destructive);
+    --color-border: var(--border);
+    --color-input: var(--input);
+    --color-ring: var(--ring);
+    --color-chart-1: var(--chart-1);
+    --color-chart-2: var(--chart-2);
+    --color-chart-3: var(--chart-3);
+    --color-chart-4: var(--chart-4);
+    --color-chart-5: var(--chart-5);
+    --color-headline: var(--headline);
+    --color-body-text: var(--body-text);
+    --color-sidebar: var(--sidebar);
+    --color-sidebar-foreground: var(--sidebar-foreground);
+    --color-sidebar-primary: var(--sidebar-primary);
+    --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+    --color-sidebar-accent: var(--sidebar-accent);
+    --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+    --color-sidebar-border: var(--sidebar-border);
+    --color-sidebar-ring: var(--sidebar-ring);
+
+    --font-display: 'Space Grotesk', 'sans-serif';
+
+    --color-brutal-pink: #FF9CBA;
+    --color-brutal-purple: #9B72CF;
+    --color-brutal-yellow: #FCE954;
+    --color-brutal-black: #1C1C1C;
+    --color-brutal-white: #FAFAFA;
+}
+
+@utility brutal-shadow {
+    box-shadow: 4px 4px 0 0 #1C1C1C;
+}
+
+@utility brutal-shadow-lg {
+    box-shadow: 8px 8px 0 0 #1C1C1C;
+}
+
+@utility brutal-card {
+    border: 2px solid #1C1C1C;
+    background-color: #FAFAFA;
+    box-shadow: 8px 8px 0 0 #1C1C1C;
+    border-radius: 0.25rem;
+}
+
+@utility brutal-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    border: 2px solid #1C1C1C;
+    background-color: #FF9CBA;
+    color: #1C1C1C;
+    font-weight: 700;
+    box-shadow: 4px 4px 0 0 #1C1C1C;
+    transition: background-color 0.15s ease;
+}
+.brutal-btn:hover {
+    background-color: #9B72CF;
+}
+.brutal-btn:active {
+    transform: translate(4px, 4px);
+    box-shadow: none;
+}
+
+@utility brutal-input {
+    width: 100%;
+    border: 2px solid #1C1C1C;
+    background-color: #FAFAFA;
+    border-radius: 0.25rem;
+    padding: 0.75rem 1rem;
+    font-size: 0.875rem;
+    color: #1C1C1C;
+}
+.brutal-input::placeholder {
+    color: rgba(28, 28, 28, 0.5);
+}
+.brutal-input:focus {
+    outline: none;
+    box-shadow: 4px 4px 0 0 #1C1C1C;
+}
+
+@utility brutal-label {
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #1C1C1C;
+}
+
+/* Hero sparkle ornaments (neobrutalism visual asset) */
+@keyframes brutal-sparkle {
+    0%,
+    100% {
+        transform: scale(0.6) rotate(0deg);
+        opacity: 0.5;
+    }
+    50% {
+        transform: scale(1.15) rotate(20deg);
+        opacity: 1;
+    }
+}
+
+/* ponytail: reduce-motion handled by gating these behind usePrefersReducedMotion */
