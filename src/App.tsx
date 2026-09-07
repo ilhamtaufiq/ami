@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { Toaster } from 'sonner'
-import ChatPage from './features/chat/components/chat-page'
+import AmiShell from './features/chat/components/ami/AmiShell'
 import { setToken } from './lib/api-client'
 
 const queryClient = new QueryClient()
@@ -74,7 +74,7 @@ export default function App() {
   const [authed, setAuthed] = useState(() => !!localStorage.getItem('ami-token'))
   return (
     <QueryClientProvider client={queryClient}>
-      {authed ? <ChatPage /> : <LoginForm onDone={() => setAuthed(true)} />}
+      {authed ? <AmiShell /> : <LoginForm onDone={() => setAuthed(true)} />}
       <Toaster richColors position="top-center" />
     </QueryClientProvider>
   )
