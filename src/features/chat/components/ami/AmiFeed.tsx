@@ -18,7 +18,9 @@ import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import { toast } from 'sonner'
 import type { AmiChat, AmiMessage } from '../../hooks/useAmiChat'
+import { suggestFollowUps } from '../../hooks/useAmiChat'
 import { ChatChart } from '../ChatChart'
+import { X } from 'lucide-react'
 
 // Blok ```json {"type":"chart",...} dari jawaban AI → chart, teks lain dipertahankan.
 function extractCharts(content: string): Array<{ data: unknown; chart_type: string }> {
@@ -198,7 +200,15 @@ function CodeBlock({ code, lang }: { code: string; lang?: string }) {
   )
 }
 
-function ModelBubble({ msg, chat }: { msg: AmiMessage; chat: AmiChat }) {
+function ModelBubble({
+  msg,
+  chat,
+  onImage,
+}: {
+  msg: AmiMessage
+  chat: AmiChat
+  onImage: (src: string) => void
+}) {
   const [copied, setCopied] = useState(false)
   const [voted, setVoted] = useState<'up' | 'down' | null>(null)
   const [menuOpen, setMenuOpen] = useState(false)
@@ -239,6 +249,16 @@ function ModelBubble({ msg, chat }: { msg: AmiMessage; chat: AmiChat }) {
                 return <CodeBlock code={text.replace(/\n$/, '')} lang={match?.[1]} />
               },
               pre: ({ children }) => <>{children}</>,
+              img: ({ src }) =>
+                typeof src === 'string' ? (
+                  // eslint-disable-next-line jsx-a11y/alt-text, jsx-a11y/click-events-have-key-events, jsx-a11y/no-noninteractive-element-interactions
+                  <img
+                    loading="lazy"
+                    src={src}
+                    onClick={() => onImage(src)}
+                    className="my-2 max-h-64 w-auto cursor-zoom-in rounded-xl border border-[#3f4043]"
+                  />
+                ) : null,
               a: ({ href, children }) => {
                 const to = typeof href === 'string' ? href : ''
                 // Tautan laporan PDF dari tool AI → tombol unduh langsung.
@@ -308,8 +328,19 @@ function ModelBubble({ msg, chat }: { msg: AmiMessage; chat: AmiChat }) {
             </button>
             <button
               type="button"
-              title="Bagikan"
-              onClick={() => toast.info('Bagikan menyusul')}
+              title="Unduh markdown"
+              onClick={() => {
+                const blob = new Blob([displayText], { type: 'text/markdown' })
+                const url = URL.createObjectURL(blob)
+                const a = document.createElement('a')
+                a.href = url
+                a.download = `ami-jawaban-${Date.now()}.md`
+                document.body.appendChild(a)
+                a.click()
+                a.remove()
+                URL.revokeObjectURL(url)
+                toast.success('Markdown terunduh')
+              }}
               className="rounded-full p-2 text-[#9aa0a6] transition-colors hover:bg-[#2f3033] hover:text-white"
             >
               <Share2 className="h-4 w-4" />
@@ -373,6 +404,11 @@ function ModelBubble({ msg, chat }: { msg: AmiMessage; chat: AmiChat }) {
 
 export default function AmiFeed({ chat }: { chat: AmiChat }) {
   const { messages, isLoading, statusMessage, toolTrace, userName } = chat
+  const [lightbox, setLightbox] = useState<string | null>(null)
+
+  const lastAssistant = [...messages].reverse().find((m) => m.role === 'assistant' && m.content)
+  const followUps =
+    !isLoading && lastAssistant ? suggestFollowUps(stripChartBlocks(lastAssistant.content)) : []
 
   if (messages.length === 0) {
     return (
@@ -393,8 +429,49 @@ export default function AmiFeed({ chat }: { chat: AmiChat }) {
             onEdit={(next) => chat.handleSend(next)}
           />
         ) : msg.content ? (
-          <ModelBubble key={i} msg={msg} chat={chat} />
+          <ModelBubble key={i} msg={msg} chat={chat} onImage={setLightbox} />
         ) : null,
+      )}
+      {followUps.length > 0 && (
+        <div className="flex flex-wrap gap-2 pt-1">
+          {followUps.map((s) => (
+            <button
+              key={s}
+              type="button"
+              onClick={() => chat.handleSend(s)}
+              className="rounded-full border border-[#3f4043] bg-[#1e1f20] px-3.5 py-1.5 text-xs text-[#c4c7c5] transition-colors hover:bg-[#2f3033] hover:text-white"
+            >
+              {s}
+            </button>
+          ))}
+        </div>
+      )}
+      {lightbox && (
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-label="Pratinjau foto"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4"
+          onClick={() => setLightbox(null)}
+          onKeyDown={(e) => {
+            if (e.key === 'Escape') setLightbox(null)
+          }}
+        >
+          {/* eslint-disable-next-line jsx-a11y/alt-text */}
+          <img
+            src={lightbox}
+            onClick={(e) => e.stopPropagation()}
+            className="max-h-full max-w-full rounded-xl object-contain"
+          />
+          <button
+            type="button"
+            onClick={() => setLightbox(null)}
+            title="Tutup"
+            className="absolute right-4 top-4 rounded-full bg-white/90 p-2 text-black hover:bg-white"
+          >
+            <X className="h-4 w-4" />
+          </button>
+        </div>
       )}
       {isLoading && (
         <div className="flex items-center gap-3" aria-live="polite">

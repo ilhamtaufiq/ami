@@ -71,10 +71,55 @@ export const AMI_PROVIDERS = [
   { value: 'mistral', label: 'Mistral', hint: 'mistral-small' },
 ] as const
 
+export interface SuggestItem {
+  id?: number
+  label: string
+  kind: string
+}
+
+// Autocomplete multi-entitas: sumber dipilih dari kata kunci konteks.
+function detectSuggestSource(text: string): {
+  endpoint: string
+  kind: string
+  pick: (row: Record<string, unknown>) => string
+} {
+  const lower = text.toLowerCase()
+  if (/(penyedia|kontraktor|rekanan|suplier|pemenang)/.test(lower))
+    return { endpoint: '/penyedia', kind: 'Penyedia', pick: (r) => String(r.nama ?? '') }
+  if (/(berkas|dokumen|arsip|file)/.test(lower))
+    return { endpoint: '/berkas', kind: 'Berkas', pick: (r) => String(r.file_name ?? r.jenis_dokumen ?? '') }
+  if (/(usulan|surat masuk|permohonan|proposal)/.test(lower))
+    return { endpoint: '/usulan-kegiatan', kind: 'Usulan', pick: (r) => String(r.perihal ?? r.nama_pengusul ?? '') }
+  if (/(tag|label|kategori)/.test(lower))
+    return { endpoint: '/tags', kind: 'Tag', pick: (r) => String(r.name ?? '') }
+  if (/(sanitasi|ipal|septik|tinja|spm)/.test(lower))
+    return { endpoint: '/spm-sanitasi', kind: 'Sanitasi', pick: (r) => String(r.nama_infrastruktur ?? '') }
+  return { endpoint: '/pekerjaan', kind: 'Paket', pick: (r) => String(r.nama_paket ?? '') }
+}
+
+// Saran lanjutan kontekstual dari jawaban terakhir (heuristik lokal).
+export function suggestFollowUps(content: string): string[] {
+  const text = content.toLowerCase()
+  const out: string[] = []
+  const paket = /\/pekerjaan\/(\d+)/.test(content) ? true : false
+  if (/pilih salah satu/.test(text)) out.push('Detail kontrak paket pertama di atas')
+  if (/paket|pekerjaan|proyek/.test(text) && !paket) out.push('Tampilkan detail tiap paket')
+  if (/kontrak|spk|penyedia/.test(text)) out.push('Siapa penyedianya?')
+  if (/progres|fisik|keuangan/.test(text)) out.push('Bagaimana tren progresnya?')
+  if (/tiket|keluhan|laporan/.test(text)) out.push('Tiket mana yang masih terbuka?')
+  if (/\|.*\|/.test(content)) out.push('Ekspor ringkasan ini')
+  if (out.length === 0) out.push('Jelaskan lebih detail', 'Beri ringkasan singkat')
+  return out.slice(0, 3)
+}
+
 export function useAmiChat() {
   const [messages, setMessages] = useState<AmiMessage[]>([])
   const [input, setInput] = useState('')
   const [isLoading, setIsLoading] = useState(false)
+  const [suggest, setSuggest] = useState<SuggestItem[]>([])
+  const [suggestOpen, setSuggestOpen] = useState(false)
+  const [suggestIndex, setSuggestIndex] = useState(0)
+  const suggestTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
   const [sessions, setSessions] = useState<AmiSession[]>(() => getCachedSessions())
   const [activeSessionId, setActiveSessionId] = useState<number | null>(null)
   const [loadingSessions, setLoadingSessions] = useState(false)
@@ -155,6 +200,64 @@ export function useAmiChat() {
     },
     [activeSessionId, createNewSession],
   )
+
+  const renameSession = useCallback(async (sessionId: number, title: string) => {
+    try {
+      const res = await api.patch<{ success: boolean; data: { id: number; title: string } }>(
+        `/chat/sessions/${sessionId}`,
+        { title },
+      )
+      if (res.success) {
+        setSessions((prev) => prev.map((s) => (s.id === sessionId ? { ...s, title: res.data.title } : s)))
+        toast.success('Judul diubah')
+      }
+    } catch {
+      toast.error('Gagal mengubah judul')
+    }
+  }, [])
+
+  const fetchSuggest = useCallback((text: string) => {
+    if (suggestTimer.current) clearTimeout(suggestTimer.current)
+    const tail = text.split(/\s+/).pop() ?? ''
+    if (tail.length < 3) {
+      setSuggest([])
+      setSuggestOpen(false)
+      return
+    }
+    suggestTimer.current = setTimeout(async () => {
+      try {
+        const src = detectSuggestSource(text)
+        const res = await api.get<{ data: Array<Record<string, unknown>> }>(src.endpoint, {
+          params: { search: tail, per_page: 6 },
+        })
+        const rows = (Array.isArray(res.data) ? res.data : [])
+          .map((r) => ({
+            id: typeof r.id === 'number' ? r.id : undefined,
+            label: src.pick(r),
+            kind: src.kind,
+          }))
+          .filter((r) => r.label)
+        setSuggest(rows)
+        setSuggestIndex(0)
+        setSuggestOpen(rows.length > 0)
+      } catch {
+        setSuggest([])
+        setSuggestOpen(false)
+      }
+    }, 300)
+  }, [])
+
+  const applySuggestion = useCallback((nama: string) => {
+    setInput((prev) => {
+      const parts = prev.split(/\s+/)
+      parts[parts.length - 1] = nama
+      return parts.join(' ')
+    })
+    setSuggestOpen(false)
+    setSuggest([])
+  }, [])
+
+  const closeSuggest = useCallback(() => setSuggestOpen(false), [])
 
   const voteMessage = useCallback(async (messageId: number, vote: 'up' | 'down') => {
     try {
@@ -324,9 +427,17 @@ export function useAmiChat() {
     handleScroll,
     handleSend,
     stopStreaming: () => abortRef.current?.abort(),
+    suggest,
+    suggestOpen,
+    suggestIndex,
+    setSuggestIndex,
+    fetchSuggest,
+    applySuggestion,
+    closeSuggest,
     loadSession,
     createNewSession,
     deleteSession,
+    renameSession,
     voteMessage,
     regenerateLast,
   }

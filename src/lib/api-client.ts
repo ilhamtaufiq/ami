@@ -14,6 +14,13 @@ type RequestOptions = {
   responseType?: 'json' | 'blob'
 }
 
+let unauthorizedHandler: (() => void) | null = null
+
+/** Dipanggil sekali saat respons 401 (token kedaluwarsa/invalid). */
+export function onUnauthorized(handler: () => void) {
+  unauthorizedHandler = handler
+}
+
 async function request<T>(method: string, endpoint: string, body?: unknown, options: RequestOptions = {}): Promise<T> {
   let url = `${API_BASE}${endpoint}`
   if (options.params) {
@@ -44,6 +51,9 @@ async function request<T>(method: string, endpoint: string, body?: unknown, opti
   }
   const data: unknown = await response.json().catch(() => null)
   if (!response.ok) {
+    if (response.status === 401 && !endpoint.startsWith('/auth/login') && unauthorizedHandler) {
+      unauthorizedHandler()
+    }
     throw new ApiError(
       (data as { message?: string })?.message || response.statusText || 'Request failed',
       response.status,

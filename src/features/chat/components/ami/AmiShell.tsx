@@ -1,5 +1,4 @@
 import { Suspense, lazy, useState } from 'react'
-import { toast } from 'sonner'
 import { useAmiChat } from '../../hooks/useAmiChat'
 import AmiSidebar from './AmiSidebar'
 import AmiHeader from './AmiHeader'
@@ -13,10 +12,9 @@ export default function AmiShell() {
   const chat = useAmiChat()
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [collapsed, setCollapsed] = useState(false)
-  const [renamed, setRenamed] = useState<Record<number, string>>({})
   const [fotoUploadOpen, setFotoUploadOpen] = useState(false)
 
-  const sessions = chat.sessions.map((s) => (renamed[s.id] ? { ...s, title: renamed[s.id] } : s))
+  const sessions = chat.sessions
 
   const logout = () => {
     setToken(null)
@@ -34,12 +32,6 @@ export default function AmiShell() {
     setSidebarOpen(false)
   }
 
-  const renameSession = (id: number, title: string) => {
-    // ponytail: backend belum ada endpoint rename — simpan lokal dulu.
-    setRenamed((prev) => ({ ...prev, [id]: title }))
-    toast.success('Judul diubah (lokal)')
-  }
-
   return (
     <div className="ami-dark flex h-dvh overflow-hidden bg-[#131314] text-[#e3e3e3]">
       <AmiSidebar
@@ -53,7 +45,7 @@ export default function AmiShell() {
         onNewChat={newChat}
         onSelect={selectSession}
         onDelete={chat.deleteSession}
-        onRename={renameSession}
+        onRename={chat.renameSession}
       />
       <main className="flex min-w-0 flex-1 flex-col">
         <AmiHeader

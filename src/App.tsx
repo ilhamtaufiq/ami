@@ -1,8 +1,8 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { Toaster } from 'sonner'
+import { Toaster, toast } from 'sonner'
 import AmiShell from './features/chat/components/ami/AmiShell'
-import { setToken } from './lib/api-client'
+import { onUnauthorized, setToken } from './lib/api-client'
 
 const queryClient = new QueryClient()
 
@@ -72,6 +72,15 @@ function LoginForm({ onDone }: { onDone: () => void }) {
 
 export default function App() {
   const [authed, setAuthed] = useState(() => !!localStorage.getItem('ami-token'))
+
+  useEffect(() => {
+    onUnauthorized(() => {
+      setToken(null)
+      setAuthed(false)
+      toast.error('Sesi berakhir — silakan masuk lagi')
+    })
+  }, [])
+
   return (
     <QueryClientProvider client={queryClient}>
       {authed ? <AmiShell /> : <LoginForm onDone={() => setAuthed(true)} />}
