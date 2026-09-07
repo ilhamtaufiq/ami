@@ -1,21 +1,50 @@
-/* Gaya khas AMI ala Gemini dark: latar #131314, container #1e1f20. */
+/* Tema AMI: dark default (#131314), light opsional via .ami-light. */
 
 .ami-dark {
   color-scheme: dark;
   font-family: 'Google Sans Text', 'Google Sans', 'Open Sans', sans-serif;
+  --ami-bg: #131314;
+  --ami-surface: #1e1f20;
+  --ami-bubble: #2f3033;
+  --ami-hover: #3f4043;
+  --ami-text: #e3e3e3;
+  --ami-text2: #c4c7c5;
+  --ami-muted: #9aa0a6;
+  --ami-link: #8ab4f8;
+  --ami-disabled: #5f6368;
+  --ami-codebg: #0d0d0f;
+  --ami-danger: #f28b82;
+  --ami-ring: #444746;
 }
 
-.ami-dark h1,
-.ami-dark h2,
-.ami-dark h3,
-.ami-dark .font-heading {
+.ami-light {
+  color-scheme: light;
+  font-family: 'Google Sans Text', 'Google Sans', 'Open Sans', sans-serif;
+  --ami-bg: #ffffff;
+  --ami-surface: #f0f4f9;
+  --ami-bubble: #e2e7ee;
+  --ami-hover: #d3dae3;
+  --ami-text: #1f1f1f;
+  --ami-text2: #444746;
+  --ami-muted: #5f6368;
+  --ami-link: #0b57d0;
+  --ami-disabled: #9aa0a6;
+  --ami-codebg: #f0f4f9;
+  --ami-danger: #b3261e;
+  --ami-ring: #c4c7c5;
+}
+
+.ami-dark h1, .ami-light h1,
+.ami-dark h2, .ami-light h2,
+.ami-dark h3, .ami-light h3,
+.ami-dark .font-heading, .ami-light .font-heading {
   font-family: 'Google Sans Display', 'Google Sans', sans-serif;
 }
 
-.ami-dark code,
-.ami-dark pre,
-.ami-dark .font-code,
-.ami-dark .tabular-nums {
+.ami-dark code, .ami-light code,
+.ami-dark pre, .ami-light pre,
+.ami-dark .font-code, .ami-light .font-code,
+.ami-dark .tabular-nums, .ami-light .tabular-nums {
   font-family: 'Google Sans Code', ui-monospace, monospace;
 }
 

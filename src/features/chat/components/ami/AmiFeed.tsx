@@ -67,17 +67,17 @@ function EmptyState({ userName, onPick }: { userName: string | null; onPick: (p:
       <h1 className="ami-gradient-text max-w-2xl text-4xl font-medium leading-tight sm:text-5xl">
         {greeting()}{name ? `, ${name}` : ''}
       </h1>
-      <p className="mt-2 text-xl text-[#9aa0a6] sm:text-2xl">Ada yang bisa Ami bantu?</p>
+      <p className="mt-2 text-xl text-[var(--ami-muted)] sm:text-2xl">Ada yang bisa Ami bantu?</p>
       <div className="mt-8 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
         {SUGGESTIONS.map((s) => (
           <button
             key={s.label}
             type="button"
             onClick={() => onPick(s.prompt)}
-            className="rounded-2xl bg-[#1e1f20] p-4 text-left transition-colors hover:bg-[#2f3033]"
+            className="rounded-2xl bg-[var(--ami-surface)] p-4 text-left transition-colors hover:bg-[var(--ami-bubble)]"
           >
-            <span className="block text-sm text-[#e3e3e3]">{s.label}</span>
-            <span className="mt-1 line-clamp-2 block text-xs text-[#9aa0a6]">{s.prompt}</span>
+            <span className="block text-sm text-[var(--ami-text)]">{s.label}</span>
+            <span className="mt-1 line-clamp-2 block text-xs text-[var(--ami-muted)]">{s.prompt}</span>
           </button>
         ))}
       </div>
@@ -99,7 +99,7 @@ function UserBubble({
   if (editing) {
     return (
       <div className="flex justify-end">
-        <div className="w-full max-w-[85%] rounded-3xl bg-[#2f3033] p-2 sm:max-w-[75%]">
+        <div className="w-full max-w-[85%] rounded-3xl bg-[var(--ami-bubble)] p-2 sm:max-w-[75%]">
           <textarea
             value={draft}
             rows={3}
@@ -118,7 +118,7 @@ function UserBubble({
                 setDraft(content)
               }
             }}
-            className="w-full resize-none bg-transparent p-3 text-[15px] leading-relaxed text-[#e3e3e3] outline-none"
+            className="w-full resize-none bg-transparent p-3 text-[15px] leading-relaxed text-[var(--ami-text)] outline-none"
           />
           <div className="flex justify-end gap-2 px-2 pb-1">
             <button
@@ -127,7 +127,7 @@ function UserBubble({
                 setEditing(false)
                 setDraft(content)
               }}
-              className="rounded-full px-3 py-1.5 text-sm text-[#c4c7c5] hover:bg-[#3f4043]"
+              className="rounded-full px-3 py-1.5 text-sm text-[var(--ami-text2)] hover:bg-[var(--ami-hover)]"
             >
               Batal
             </button>
@@ -140,7 +140,7 @@ function UserBubble({
                   onEdit(draft.trim())
                 }
               }}
-              className="rounded-full bg-[#e3e3e3] px-4 py-1.5 text-sm font-medium text-[#131314] disabled:opacity-40"
+              className="rounded-full bg-[var(--ami-text)] px-4 py-1.5 text-sm font-medium text-[var(--ami-bg)] disabled:opacity-40"
             >
               Kirim
             </button>
@@ -151,7 +151,7 @@ function UserBubble({
   }
   return (
     <div className="group/user flex items-start justify-end gap-1">
-      <div className="max-w-[85%] whitespace-pre-wrap break-words rounded-3xl bg-[#2f3033] px-5 py-3 text-[15px] leading-relaxed text-[#e3e3e3] sm:max-w-[75%]">
+      <div className="max-w-[85%] whitespace-pre-wrap break-words rounded-3xl bg-[var(--ami-bubble)] px-5 py-3 text-[15px] leading-relaxed text-[var(--ami-text)] sm:max-w-[75%]">
         {content}
       </div>
       {!disabled && (
@@ -162,7 +162,7 @@ function UserBubble({
             setDraft(content)
             setEditing(true)
           }}
-          className="mt-2 rounded-full p-2 text-[#9aa0a6] opacity-0 transition-opacity hover:bg-[#2f3033] hover:text-white group-hover/user:opacity-100"
+          className="mt-2 rounded-full p-2 text-[var(--ami-muted)] opacity-0 transition-opacity hover:bg-[var(--ami-bubble)] hover:text-[var(--ami-text)] group-hover/user:opacity-100"
         >
           <Pencil className="h-4 w-4" />
         </button>
@@ -174,8 +174,8 @@ function UserBubble({
 function CodeBlock({ code, lang }: { code: string; lang?: string }) {
   const [copied, setCopied] = useState(false)
   return (
-    <div className="relative my-3 overflow-hidden rounded-xl bg-[#0d0d0f]">
-      <div className="flex items-center justify-between px-4 py-2 text-xs text-[#9aa0a6]">
+    <div className="relative my-3 overflow-hidden rounded-xl bg-[var(--ami-codebg)]">
+      <div className="flex items-center justify-between px-4 py-2 text-xs text-[var(--ami-muted)]">
         <span>{lang || 'code'}</span>
         <button
           type="button"
@@ -188,13 +188,13 @@ function CodeBlock({ code, lang }: { code: string; lang?: string }) {
               () => toast.error('Gagal menyalin'),
             )
           }}
-          className="flex items-center gap-1.5 rounded-md px-2 py-1 transition-colors hover:bg-white/10 hover:text-white"
+          className="flex items-center gap-1.5 rounded-md px-2 py-1 transition-colors hover:bg-white/10 hover:text-[var(--ami-text)]"
         >
           {copied ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />}
           {copied ? 'Disalin' : 'Copy code'}
         </button>
       </div>
-      <pre className="overflow-x-auto p-4 pt-0 text-[13px] leading-relaxed text-[#e3e3e3]">
+      <pre className="overflow-x-auto p-4 pt-0 text-[13px] leading-relaxed text-[var(--ami-text)]">
         <code>{code}</code>
       </pre>
     </div>
@@ -210,7 +210,7 @@ function UsageBadge({ msg }: { msg: AmiMessage }) {
   const show = msg.instant || total > 0 || msg.cost_idr != null || msg.cached
   if (!show) return null
   return (
-    <p className="mt-1.5 flex flex-wrap items-center gap-1.5 text-[11px] text-[#9aa0a6]">
+    <p className="mt-1.5 flex flex-wrap items-center gap-1.5 text-[11px] text-[var(--ami-muted)]">
       {msg.instant ? (
         <span
           title="Jawaban langsung dari database — 0 token, tanpa AI"
@@ -267,7 +267,7 @@ function ModelBubble({
     <div className="group flex gap-3">
       <Sparkles className="ami-gradient-icon mt-1 h-6 w-6 shrink-0" />
       <div className="min-w-0 flex-1">
-        <div className="ami-markdown text-[15px] leading-8 text-[#e3e3e3]">
+        <div className="ami-markdown text-[15px] leading-8 text-[var(--ami-text)]">
           <ReactMarkdown
             remarkPlugins={[remarkGfm]}
             components={{
@@ -275,7 +275,7 @@ function ModelBubble({
                 const text = String(children ?? '')
                 const match = /language-(\w+)/.exec(className ?? '')
                 if (!text.includes('\n')) {
-                  return <code className="rounded bg-[#2f3033] px-1.5 py-0.5 text-[13px]">{children}</code>
+                  return <code className="rounded bg-[var(--ami-bubble)] px-1.5 py-0.5 text-[13px]">{children}</code>
                 }
                 return <CodeBlock code={text.replace(/\n$/, '')} lang={match?.[1]} />
               },
@@ -287,7 +287,7 @@ function ModelBubble({
                     loading="lazy"
                     src={src}
                     onClick={() => onImage(src)}
-                    className="my-2 max-h-64 w-auto cursor-zoom-in rounded-xl border border-[#3f4043]"
+                    className="my-2 max-h-64 w-auto cursor-zoom-in rounded-xl border border-[var(--ami-hover)]"
                   />
                 ) : null,
               a: ({ href, children }) => {
@@ -304,7 +304,7 @@ function ModelBubble({
                         if (err) toast.error(err)
                         else toast.success('Laporan PDF terunduh')
                       }}
-                      className="inline-flex items-center gap-1.5 rounded-full bg-[#2f3033] px-4 py-2 text-sm text-[#e3e3e3] transition-colors hover:bg-[#3f4043]"
+                      className="inline-flex items-center gap-1.5 rounded-full bg-[var(--ami-bubble)] px-4 py-2 text-sm text-[var(--ami-text)] transition-colors hover:bg-[var(--ami-hover)]"
                     >
                       <FileDown className="h-4 w-4" />
                       {children}
@@ -312,7 +312,7 @@ function ModelBubble({
                   )
                 }
                 return (
-                  <a href={href} target="_blank" rel="noopener noreferrer" className="text-[#8ab4f8] hover:underline">
+                  <a href={href} target="_blank" rel="noopener noreferrer" className="text-[var(--ami-link)] hover:underline">
                     {children}
                   </a>
                 )
@@ -333,7 +333,7 @@ function ModelBubble({
         ))}
 
         {msg.tool_calls && msg.tool_calls.length > 0 && (
-          <p className="mt-2 flex items-center gap-1.5 text-xs text-[#9aa0a6]">
+          <p className="mt-2 flex items-center gap-1.5 text-xs text-[var(--ami-muted)]">
             <Wrench className="h-3.5 w-3.5" />
             {msg.tool_calls.length} sumber data: {msg.tool_calls.map((t) => t.function.name.replaceAll('_', ' ')).join(', ')}
           </p>
@@ -346,7 +346,7 @@ function ModelBubble({
               type="button"
               title="Bagus"
               onClick={() => vote('up')}
-              className={`rounded-full p-2 transition-colors hover:bg-[#2f3033] ${voted === 'up' ? 'text-white' : 'text-[#9aa0a6]'}`}
+              className={`rounded-full p-2 transition-colors hover:bg-[var(--ami-bubble)] ${voted === 'up' ? 'text-white' : 'text-[var(--ami-muted)]'}`}
             >
               <ThumbsUp className="h-4 w-4" />
             </button>
@@ -354,7 +354,7 @@ function ModelBubble({
               type="button"
               title="Kurang"
               onClick={() => vote('down')}
-              className={`rounded-full p-2 transition-colors hover:bg-[#2f3033] ${voted === 'down' ? 'text-white' : 'text-[#9aa0a6]'}`}
+              className={`rounded-full p-2 transition-colors hover:bg-[var(--ami-bubble)] ${voted === 'down' ? 'text-white' : 'text-[var(--ami-muted)]'}`}
             >
               <ThumbsDown className="h-4 w-4" />
             </button>
@@ -373,7 +373,7 @@ function ModelBubble({
                 URL.revokeObjectURL(url)
                 toast.success('Markdown terunduh')
               }}
-              className="rounded-full p-2 text-[#9aa0a6] transition-colors hover:bg-[#2f3033] hover:text-white"
+              className="rounded-full p-2 text-[var(--ami-muted)] transition-colors hover:bg-[var(--ami-bubble)] hover:text-[var(--ami-text)]"
             >
               <Share2 className="h-4 w-4" />
             </button>
@@ -381,7 +381,7 @@ function ModelBubble({
               type="button"
               title="Salin teks"
               onClick={copyText}
-              className="rounded-full p-2 text-[#9aa0a6] transition-colors hover:bg-[#2f3033] hover:text-white"
+              className="rounded-full p-2 text-[var(--ami-muted)] transition-colors hover:bg-[var(--ami-bubble)] hover:text-[var(--ami-text)]"
             >
               {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
             </button>
@@ -396,7 +396,7 @@ function ModelBubble({
                   toast.error('Gagal membuat PDF')
                 }
               }}
-              className="rounded-full p-2 text-[#9aa0a6] transition-colors hover:bg-[#2f3033] hover:text-white"
+              className="rounded-full p-2 text-[var(--ami-muted)] transition-colors hover:bg-[var(--ami-bubble)] hover:text-[var(--ami-text)]"
             >
               <Printer className="h-4 w-4" />
             </button>
@@ -405,21 +405,21 @@ function ModelBubble({
                 type="button"
                 title="Lainnya"
                 onClick={() => setMenuOpen((v) => !v)}
-                className="rounded-full p-2 text-[#9aa0a6] transition-colors hover:bg-[#2f3033] hover:text-white"
+                className="rounded-full p-2 text-[var(--ami-muted)] transition-colors hover:bg-[var(--ami-bubble)] hover:text-[var(--ami-text)]"
               >
                 <EllipsisVertical className="h-4 w-4" />
               </button>
               {menuOpen && (
                 <>
                   <div className="fixed inset-0 z-30" onClick={() => setMenuOpen(false)} />
-                  <div className="absolute left-0 z-40 w-44 overflow-hidden rounded-xl bg-[#2f3033] py-1 shadow-xl">
+                  <div className="absolute left-0 z-40 w-44 overflow-hidden rounded-xl bg-[var(--ami-bubble)] py-1 shadow-xl">
                     <button
                       type="button"
                       onClick={() => {
                         setMenuOpen(false)
                         chat.regenerateLast()
                       }}
-                      className="flex w-full items-center gap-2.5 px-4 py-2 text-left text-sm text-[#e3e3e3] hover:bg-[#3f4043]"
+                      className="flex w-full items-center gap-2.5 px-4 py-2 text-left text-sm text-[var(--ami-text)] hover:bg-[var(--ami-hover)]"
                     >
                       <RotateCcw className="h-4 w-4" /> Coba lagi
                     </button>
@@ -471,7 +471,7 @@ export default function AmiFeed({ chat }: { chat: AmiChat }) {
               key={s}
               type="button"
               onClick={() => chat.handleSend(s)}
-              className="rounded-full border border-[#3f4043] bg-[#1e1f20] px-3.5 py-1.5 text-xs text-[#c4c7c5] transition-colors hover:bg-[#2f3033] hover:text-white"
+              className="rounded-full border border-[var(--ami-hover)] bg-[var(--ami-surface)] px-3.5 py-1.5 text-xs text-[var(--ami-text2)] transition-colors hover:bg-[var(--ami-bubble)] hover:text-[var(--ami-text)]"
             >
               {s}
             </button>
@@ -508,7 +508,7 @@ export default function AmiFeed({ chat }: { chat: AmiChat }) {
       {isLoading && (
         <div className="flex items-center gap-3" aria-live="polite">
           <Sparkles className="ami-gradient-icon h-6 w-6 animate-pulse" />
-          <span className="text-sm italic text-[#9aa0a6]">{statusMessage ?? 'Menyiapkan jawaban...'}</span>
+          <span className="text-sm italic text-[var(--ami-muted)]">{statusMessage ?? 'Menyiapkan jawaban...'}</span>
         </div>
       )}
       {isLoading && toolTrace.length > 0 && (
@@ -516,7 +516,7 @@ export default function AmiFeed({ chat }: { chat: AmiChat }) {
           {toolTrace.map((tool) => (
             <span
               key={tool}
-              className="inline-flex items-center gap-1 rounded-full bg-[#2f3033] px-2.5 py-1 text-[11px] text-[#9aa0a6]"
+              className="inline-flex items-center gap-1 rounded-full bg-[var(--ami-bubble)] px-2.5 py-1 text-[11px] text-[var(--ami-muted)]"
             >
               <Wrench className="h-3 w-3" />
               {tool.replaceAll('_', ' ')}
@@ -525,7 +525,7 @@ export default function AmiFeed({ chat }: { chat: AmiChat }) {
         </div>
       )}
       {isLoading && !statusMessage && (
-        <Loader2 className="h-5 w-5 animate-spin text-[#9aa0a6]" />
+        <Loader2 className="h-5 w-5 animate-spin text-[var(--ami-muted)]" />
       )}
     </div>
   )

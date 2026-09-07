@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Check, ChevronDown, Menu, Sparkles, Zap } from 'lucide-react'
+import { Check, ChevronDown, Menu, Moon, Sparkles, Sun, Zap } from 'lucide-react'
 import { toast } from 'sonner'
 import { cn } from '@/lib/utils'
 import api from '@/lib/api-client'
@@ -10,6 +10,8 @@ interface AmiHeaderProps {
   onProvider: (value: string) => void
   userName: string | null
   totals: SessionTotals
+  theme: 'dark' | 'light'
+  onToggleTheme: () => void
   onMenu: () => void
   onLogout: () => void
 }
@@ -18,7 +20,7 @@ function formatIdr(value: number): string {
   return 'Rp' + value.toLocaleString('id-ID', { maximumFractionDigits: 2 })
 }
 
-export default function AmiHeader({ provider, onProvider, userName, totals, onMenu, onLogout }: AmiHeaderProps) {
+export default function AmiHeader({ provider, onProvider, userName, totals, theme, onToggleTheme, onMenu, onLogout }: AmiHeaderProps) {
   const [open, setOpen] = useState(false)
   const [userOpen, setUserOpen] = useState(false)
   const [passOpen, setPassOpen] = useState(false)
@@ -53,7 +55,7 @@ export default function AmiHeader({ provider, onProvider, userName, totals, onMe
         type="button"
         onClick={onMenu}
         aria-label="Menu"
-        className="rounded-full p-2.5 text-[#c4c7c5] transition-colors hover:bg-[#2f3033] md:hidden"
+        className="rounded-full p-2.5 text-[var(--ami-text2)] transition-colors hover:bg-[var(--ami-bubble)] md:hidden"
       >
         <Menu className="h-5 w-5" />
       </button>
@@ -63,16 +65,16 @@ export default function AmiHeader({ provider, onProvider, userName, totals, onMe
         <button
           type="button"
           onClick={() => setOpen((v) => !v)}
-          className="flex items-center gap-1.5 rounded-full px-3 py-2 text-[15px] text-[#e3e3e3] transition-colors hover:bg-[#2f3033]"
+          className="flex items-center gap-1.5 rounded-full px-3 py-2 text-[15px] text-[var(--ami-text)] transition-colors hover:bg-[var(--ami-bubble)]"
         >
           <Sparkles className="ami-gradient-icon h-4 w-4" />
           {active.label}
-          <ChevronDown className={cn('h-4 w-4 text-[#9aa0a6] transition-transform', open && 'rotate-180')} />
+          <ChevronDown className={cn('h-4 w-4 text-[var(--ami-muted)] transition-transform', open && 'rotate-180')} />
         </button>
         {open && (
           <>
             <div className="fixed inset-0 z-30" onClick={() => setOpen(false)} />
-            <div className="absolute left-0 top-full z-40 mt-1 w-64 overflow-hidden rounded-2xl bg-[#2f3033] py-1.5 shadow-xl">
+            <div className="absolute left-0 top-full z-40 mt-1 w-64 overflow-hidden rounded-2xl bg-[var(--ami-bubble)] py-1.5 shadow-xl">
               {AMI_PROVIDERS.map((p) => (
                 <button
                   key={p.value}
@@ -80,13 +82,13 @@ export default function AmiHeader({ provider, onProvider, userName, totals, onMe
                     onProvider(p.value)
                     setOpen(false)
                   }}
-                  className="flex w-full items-center gap-3 px-4 py-2.5 text-left transition-colors hover:bg-[#3f4043]"
+                  className="flex w-full items-center gap-3 px-4 py-2.5 text-left transition-colors hover:bg-[var(--ami-hover)]"
                 >
                   <span className="flex-1">
-                    <span className="block text-sm text-[#e3e3e3]">{p.label}</span>
-                    <span className="block text-xs text-[#9aa0a6]">{p.hint}</span>
+                    <span className="block text-sm text-[var(--ami-text)]">{p.label}</span>
+                    <span className="block text-xs text-[var(--ami-muted)]">{p.hint}</span>
                   </span>
-                  {p.value === provider && <Check className="h-4 w-4 text-[#e3e3e3]" />}
+                  {p.value === provider && <Check className="h-4 w-4 text-[var(--ami-text)]" />}
                 </button>
               ))}
             </div>
@@ -96,9 +98,19 @@ export default function AmiHeader({ provider, onProvider, userName, totals, onMe
 
       <div className="flex-1" />
 
+      <button
+        type="button"
+        onClick={onToggleTheme}
+        title={theme === 'dark' ? 'Mode terang' : 'Mode gelap'}
+        aria-label="Ganti tema"
+        className="rounded-full p-2.5 text-[var(--ami-text2)] transition-colors hover:bg-[var(--ami-bubble)]"
+      >
+        {theme === 'dark' ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
+      </button>
+
       {totals.tokens > 0 && (
         <span
-          className="mr-1 hidden items-center gap-1 text-[11px] text-[#9aa0a6] sm:flex"
+          className="mr-1 hidden items-center gap-1 text-[11px] text-[var(--ami-muted)] sm:flex"
           title={
             totals.hasPricing
               ? `In ${totals.prompt.toLocaleString()} · Out ${totals.completion.toLocaleString()} · Estimasi biaya sesi ini`
@@ -106,7 +118,7 @@ export default function AmiHeader({ provider, onProvider, userName, totals, onMe
           }
         >
           <Zap className="h-3 w-3" />↑{totals.prompt.toLocaleString()} ↓{totals.completion.toLocaleString()}
-          {totals.hasPricing && <span className="font-semibold text-[#e3e3e3]">· {formatIdr(totals.cost)}</span>}
+          {totals.hasPricing && <span className="font-semibold text-[var(--ami-text)]">· {formatIdr(totals.cost)}</span>}
         </span>
       )}
 
@@ -124,12 +136,12 @@ export default function AmiHeader({ provider, onProvider, userName, totals, onMe
         {userOpen && (
           <>
             <div className="fixed inset-0 z-30" onClick={() => setUserOpen(false)} />
-            <div className="absolute right-0 top-full z-40 mt-2 w-56 overflow-hidden rounded-2xl bg-[#2f3033] py-1.5 shadow-xl">
-              <p className="truncate px-4 py-2 text-sm text-[#e3e3e3]">{userName ?? 'Pengguna AMI'}</p>
+            <div className="absolute right-0 top-full z-40 mt-2 w-56 overflow-hidden rounded-2xl bg-[var(--ami-bubble)] py-1.5 shadow-xl">
+              <p className="truncate px-4 py-2 text-sm text-[var(--ami-text)]">{userName ?? 'Pengguna AMI'}</p>
               <button
                 type="button"
                 onClick={() => setPassOpen((v) => !v)}
-                className="flex w-full items-center px-4 py-2.5 text-left text-sm text-[#e3e3e3] transition-colors hover:bg-[#3f4043]"
+                className="flex w-full items-center px-4 py-2.5 text-left text-sm text-[var(--ami-text)] transition-colors hover:bg-[var(--ami-hover)]"
               >
                 Ganti password
               </button>
@@ -142,12 +154,12 @@ export default function AmiHeader({ provider, onProvider, userName, totals, onMe
                     placeholder="Password baru (min 6)"
                     minLength={6}
                     required
-                    className="w-full rounded-lg bg-[#1e1f20] px-3 py-2 text-sm text-[#e3e3e3] outline-none placeholder:text-[#9aa0a6]"
+                    className="w-full rounded-lg bg-[var(--ami-surface)] px-3 py-2 text-sm text-[var(--ami-text)] outline-none placeholder:text-[var(--ami-muted)]"
                   />
                   <button
                     type="submit"
                     disabled={passLoading}
-                    className="w-full rounded-lg bg-[#e3e3e3] py-1.5 text-sm font-medium text-[#131314] disabled:opacity-50"
+                    className="w-full rounded-lg bg-[var(--ami-text)] py-1.5 text-sm font-medium text-[var(--ami-bg)] disabled:opacity-50"
                   >
                     {passLoading ? 'Menyimpan...' : 'Simpan'}
                   </button>
@@ -156,7 +168,7 @@ export default function AmiHeader({ provider, onProvider, userName, totals, onMe
               <button
                 type="button"
                 onClick={onLogout}
-                className="flex w-full items-center px-4 py-2.5 text-left text-sm text-[#e3e3e3] transition-colors hover:bg-[#3f4043]"
+                className="flex w-full items-center px-4 py-2.5 text-left text-sm text-[var(--ami-text)] transition-colors hover:bg-[var(--ami-hover)]"
               >
                 Keluar
               </button>

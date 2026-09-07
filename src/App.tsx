@@ -4,6 +4,7 @@ import { Toaster, toast } from 'sonner'
 import { Loader2 } from 'lucide-react'
 import AmiShell from './features/chat/components/ami/AmiShell'
 import { onUnauthorized, setToken } from './lib/api-client'
+import { useAmiTheme } from './hooks/use-ami-theme'
 import {
   amiLoginUrl,
   bunSignInUrl,
@@ -14,19 +15,19 @@ import {
 
 const queryClient = new QueryClient()
 
-function LoginScreen({ error }: { error: string | null }) {
+function LoginScreen({ error, themeClass }: { error: string | null; themeClass: string }) {
   return (
-    <div className="ami-dark flex min-h-screen items-center justify-center bg-[#131314] p-4">
-      <div className="w-full max-w-sm space-y-4 rounded-3xl bg-[#1e1f20] p-8 text-center">
+    <div className={`${themeClass} flex min-h-screen items-center justify-center bg-[var(--ami-bg)] p-4`}>
+      <div className="w-full max-w-sm space-y-4 rounded-3xl bg-[var(--ami-surface)] p-8 text-center">
         <h1 className="ami-gradient-text text-3xl font-medium">AMI Asisten</h1>
-        <p className="text-sm text-[#9aa0a6]">
+        <p className="text-sm text-[var(--ami-muted)]">
           Masuk lewat portal Arumanis — tanpa password tambahan di sini.
         </p>
-        {error && <p className="text-sm text-[#f28b82]">{error}</p>}
+        {error && <p className="text-sm text-[var(--ami-danger)]">{error}</p>}
         <button
           type="button"
           onClick={() => window.location.replace(bunSignInUrl(amiLoginUrl()))}
-          className="w-full rounded-full bg-[#e3e3e3] px-3 py-2.5 text-sm font-medium text-[#131314] transition-transform hover:scale-[1.02]"
+          className="w-full rounded-full bg-[var(--ami-text)] px-3 py-2.5 text-sm font-medium text-[var(--ami-bg)] transition-transform hover:scale-[1.02]"
         >
           Masuk via Arumanis
         </button>
@@ -40,6 +41,8 @@ export default function App() {
   const [booting, setBooting] = useState(() => getHandoffCode() != null)
   const [ssoError, setSsoError] = useState<string | null>(null)
   const exchangedRef = useRef(false)
+  const { theme, toggle } = useAmiTheme()
+  const themeClass = theme === 'dark' ? 'ami-dark' : 'ami-light'
 
   useEffect(() => {
     onUnauthorized(() => {
@@ -70,7 +73,7 @@ export default function App() {
 
   if (booting) {
     return (
-      <div className="ami-dark flex min-h-screen items-center justify-center gap-3 bg-[#131314] text-sm text-[#9aa0a6]">
+      <div className={`${themeClass} flex min-h-screen items-center justify-center gap-3 bg-[var(--ami-bg)] text-sm text-[var(--ami-muted)]`}>
         <Loader2 className="h-5 w-5 animate-spin" />
         Memeriksa sesi Arumanis…
       </div>
@@ -79,7 +82,11 @@ export default function App() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      {authed ? <AmiShell /> : <LoginScreen error={ssoError} />}
+      {authed ? (
+        <AmiShell theme={theme} onToggleTheme={toggle} />
+      ) : (
+        <LoginScreen error={ssoError} themeClass={themeClass} />
+      )}
       <Toaster richColors position="top-center" />
     </QueryClientProvider>
   )

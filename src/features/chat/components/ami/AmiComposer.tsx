@@ -38,12 +38,12 @@ export default function AmiComposer({ chat, onFoto }: { chat: AmiChat; onFoto: (
             handleSend()
             requestAnimationFrame(autosize)
           }}
-          className="flex items-end gap-1.5 rounded-[28px] bg-[#1e1f20] px-2.5 py-2.5 transition-shadow focus-within:shadow-[0_0_0_1px_#444746]"
+          className="flex items-end gap-1.5 rounded-[28px] bg-[var(--ami-surface)] px-2.5 py-2.5 transition-shadow focus-within:shadow-[0_0_0_1px_#444746]"
         >
           <button
             type="button"
             title="Upload file / tools"
-            className="rounded-full p-2.5 text-[#c4c7c5] transition-colors hover:bg-[#2f3033]"
+            className="rounded-full p-2.5 text-[var(--ami-text2)] transition-colors hover:bg-[var(--ami-bubble)]"
           >
             <Plus className="h-5 w-5" />
           </button>
@@ -89,10 +89,10 @@ export default function AmiComposer({ chat, onFoto }: { chat: AmiChat; onFoto: (
               }}
               onBlur={() => setTimeout(closeSuggest, 150)}
               placeholder="Tanyakan Ami"
-              className="max-h-[200px] w-full flex-1 resize-none bg-transparent py-2.5 text-[15px] leading-relaxed text-[#e3e3e3] outline-none placeholder:text-[#9aa0a6] disabled:opacity-50"
+              className="max-h-[200px] w-full flex-1 resize-none bg-transparent py-2.5 text-[15px] leading-relaxed text-[var(--ami-text)] outline-none placeholder:text-[var(--ami-muted)] disabled:opacity-50"
             />
             {suggestOpen && suggest.length > 0 && (
-              <ul className="absolute bottom-full left-0 right-0 mb-2 overflow-hidden rounded-2xl bg-[#2f3033] py-1 shadow-xl">
+              <ul className="absolute bottom-full left-0 right-0 mb-2 overflow-hidden rounded-2xl bg-[var(--ami-bubble)] py-1 shadow-xl">
                 {suggest.map((p, idx) => (
                   <li key={p.id ?? `${p.kind}-${idx}`}>
                     <button
@@ -102,12 +102,12 @@ export default function AmiComposer({ chat, onFoto }: { chat: AmiChat; onFoto: (
                         applySuggestion(p.label)
                       }}
                       onMouseEnter={() => setSuggestIndex(idx)}
-                      className={`flex w-full items-center gap-2 truncate px-4 py-2.5 text-left text-sm ${idx === suggestIndex ? 'bg-[#3f4043]' : ''}`}
+                      className={`flex w-full items-center gap-2 truncate px-4 py-2.5 text-left text-sm ${idx === suggestIndex ? 'bg-[var(--ami-hover)]' : ''}`}
                     >
-                      <span className="shrink-0 rounded-full bg-[#8ab4f8]/15 px-2 py-0.5 text-[10px] font-medium text-[#8ab4f8]">
+                      <span className="shrink-0 rounded-full bg-[var(--ami-link)]/15 px-2 py-0.5 text-[10px] font-medium text-[var(--ami-link)]">
                         {p.kind}
                       </span>
-                      <span className="truncate text-[#e3e3e3]">{p.label}</span>
+                      <span className="truncate text-[var(--ami-text)]">{p.label}</span>
                     </button>
                   </li>
                 ))}
@@ -118,14 +118,14 @@ export default function AmiComposer({ chat, onFoto }: { chat: AmiChat; onFoto: (
             type="button"
             title="Kirim foto ke paket"
             onClick={onFoto}
-            className="rounded-full p-2.5 text-[#c4c7c5] transition-colors hover:bg-[#2f3033]"
+            className="rounded-full p-2.5 text-[var(--ami-text2)] transition-colors hover:bg-[var(--ami-bubble)]"
           >
             <Camera className="h-5 w-5" />
           </button>
           <button
             type="button"
             title="Input suara"
-            className="rounded-full p-2.5 text-[#c4c7c5] transition-colors hover:bg-[#2f3033]"
+            className="rounded-full p-2.5 text-[var(--ami-text2)] transition-colors hover:bg-[var(--ami-bubble)]"
           >
             <Mic className="h-5 w-5" />
           </button>
@@ -134,7 +134,7 @@ export default function AmiComposer({ chat, onFoto }: { chat: AmiChat; onFoto: (
               type="button"
               title="Hentikan"
               onClick={stopStreaming}
-              className="rounded-full bg-[#e3e3e3] p-2.5 text-[#131314] transition-transform hover:scale-105"
+              className="rounded-full bg-[var(--ami-text)] p-2.5 text-[var(--ami-bg)] transition-transform hover:scale-105"
             >
               <Square className="h-5 w-5" />
             </button>
@@ -146,15 +146,15 @@ export default function AmiComposer({ chat, onFoto }: { chat: AmiChat; onFoto: (
               className={cn(
                 'rounded-full p-2.5 transition-all',
                 canSend
-                  ? 'bg-[#e3e3e3] text-[#131314] hover:scale-105'
-                  : 'cursor-default bg-[#2f3033] text-[#5f6368]',
+                  ? 'bg-[var(--ami-text)] text-[var(--ami-bg)] hover:scale-105'
+                  : 'cursor-default bg-[var(--ami-bubble)] text-[var(--ami-disabled)]',
               )}
             >
               <ArrowUp className="h-5 w-5" />
             </button>
           )}
         </form>
-        <p className="px-2 pb-1 pt-2 text-center text-[11px] text-[#9aa0a6]">
+        <p className="px-2 pb-1 pt-2 text-center text-[11px] text-[var(--ami-muted)]">
           Ami dapat menampilkan info yang tidak akurat, jadi periksa kembali jawabannya.
         </p>
       </div>

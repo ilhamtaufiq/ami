@@ -9,7 +9,13 @@ import { bunSignInUrl } from '@/lib/sso'
 
 const ChatFotoUploadDialog = lazy(() => import('../ChatFotoUpload'))
 
-export default function AmiShell() {
+export default function AmiShell({
+  theme,
+  onToggleTheme,
+}: {
+  theme: 'dark' | 'light'
+  onToggleTheme: () => void
+}) {
   const chat = useAmiChat()
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [collapsed, setCollapsed] = useState(false)
@@ -34,7 +40,7 @@ export default function AmiShell() {
   }
 
   return (
-    <div className="ami-dark flex h-dvh overflow-hidden bg-[#131314] text-[#e3e3e3]">
+    <div className={`${theme === 'dark' ? 'ami-dark' : 'ami-light'} flex h-dvh overflow-hidden bg-[var(--ami-bg)] text-[var(--ami-text)]`}>
       <AmiSidebar
         open={sidebarOpen}
         collapsed={collapsed}
@@ -54,6 +60,8 @@ export default function AmiShell() {
           onProvider={chat.setProvider}
           userName={chat.userName}
           totals={chat.totals}
+          theme={theme}
+          onToggleTheme={onToggleTheme}
           onMenu={() => setSidebarOpen(true)}
           onLogout={logout}
         />

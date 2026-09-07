@@ -67,7 +67,7 @@ function SessionRow({
   if (renaming) {
     return (
       <form
-        className="flex items-center gap-1 rounded-full bg-[#2f3033] px-3 py-2"
+        className="flex items-center gap-1 rounded-full bg-[var(--ami-bubble)] px-3 py-2"
         onSubmit={(e) => {
           e.preventDefault()
           if (draft.trim()) onRename(draft.trim())
@@ -83,7 +83,7 @@ function SessionRow({
             setRenaming(false)
             setMenuOpen(false)
           }}
-          className="w-full bg-transparent text-sm text-[#e3e3e3] outline-none"
+          className="w-full bg-transparent text-sm text-[var(--ami-text)] outline-none"
         />
       </form>
     )
@@ -93,7 +93,7 @@ function SessionRow({
     <div
       className={cn(
         'group relative flex cursor-pointer items-center gap-2 rounded-full py-2 pl-4 pr-2 text-sm transition-colors',
-        active ? 'bg-[#2f3033] text-[#e3e3e3]' : 'text-[#c4c7c5] hover:bg-[#2f3033]/70',
+        active ? 'bg-[var(--ami-bubble)] text-[var(--ami-text)]' : 'text-[var(--ami-text2)] hover:bg-[var(--ami-bubble)]/70',
       )}
       onClick={onSelect}
       title={session.title}
@@ -108,7 +108,7 @@ function SessionRow({
             setMenuOpen((v) => !v)
           }}
           className={cn(
-            'rounded-full p-1.5 text-[#c4c7c5] hover:bg-[#3f4043] hover:text-white',
+            'rounded-full p-1.5 text-[var(--ami-text2)] hover:bg-[var(--ami-hover)] hover:text-[var(--ami-text)]',
             menuOpen ? 'opacity-100' : 'opacity-0 group-hover:opacity-100 focus-visible:opacity-100',
           )}
         >
@@ -117,7 +117,7 @@ function SessionRow({
         {menuOpen && (
           <>
             <div className="fixed inset-0 z-30" onClick={(e) => { e.stopPropagation(); setMenuOpen(false) }} />
-            <div className="absolute right-0 z-40 w-40 overflow-hidden rounded-xl bg-[#2f3033] py-1 shadow-xl">
+            <div className="absolute right-0 z-40 w-40 overflow-hidden rounded-xl bg-[var(--ami-bubble)] py-1 shadow-xl">
               <button
                 type="button"
                 onClick={(e) => {
@@ -125,7 +125,7 @@ function SessionRow({
                   setDraft(session.title)
                   setRenaming(true)
                 }}
-                className="flex w-full items-center gap-2.5 px-4 py-2 text-left text-sm text-[#e3e3e3] hover:bg-[#3f4043]"
+                className="flex w-full items-center gap-2.5 px-4 py-2 text-left text-sm text-[var(--ami-text)] hover:bg-[var(--ami-hover)]"
               >
                 <Pencil className="h-4 w-4" /> Rename
               </button>
@@ -136,7 +136,7 @@ function SessionRow({
                   setMenuOpen(false)
                   onDelete()
                 }}
-                className="flex w-full items-center gap-2.5 px-4 py-2 text-left text-sm text-[#f28b82] hover:bg-[#3f4043]"
+                className="flex w-full items-center gap-2.5 px-4 py-2 text-left text-sm text-[var(--ami-danger)] hover:bg-[var(--ami-hover)]"
               >
                 <Trash2 className="h-4 w-4" /> Delete
               </button>
@@ -164,7 +164,7 @@ export default function AmiSidebar(props: AmiSidebarProps) {
       />
       <aside
         className={cn(
-          'fixed inset-y-0 left-0 z-40 flex w-[280px] flex-col bg-[#1e1f20] transition-transform duration-300 md:static md:z-auto',
+          'fixed inset-y-0 left-0 z-40 flex w-[280px] flex-col bg-[var(--ami-surface)] transition-transform duration-300 md:static md:z-auto',
           open ? 'translate-x-0' : '-translate-x-full md:translate-x-0',
           collapsed && 'md:w-[72px]',
         )}
@@ -175,12 +175,12 @@ export default function AmiSidebar(props: AmiSidebarProps) {
             type="button"
             onClick={props.onToggle}
             aria-label="Toggle menu"
-            className="rounded-full p-2.5 text-[#c4c7c5] transition-colors hover:bg-[#2f3033]"
+            className="rounded-full p-2.5 text-[var(--ami-text2)] transition-colors hover:bg-[var(--ami-bubble)]"
           >
             <Menu className="h-5 w-5" />
           </button>
           {!collapsed && (
-            <span className="flex items-center gap-2 px-1 text-[15px] text-[#c4c7c5]">
+            <span className="flex items-center gap-2 px-1 text-[15px] text-[var(--ami-text2)]">
               <Sparkles className="ami-gradient-icon h-5 w-5" />
               <span className="hidden md:inline">AMI Asisten</span>
             </span>
@@ -195,7 +195,7 @@ export default function AmiSidebar(props: AmiSidebarProps) {
               onClick={props.onNewChat}
               aria-label="Chat baru"
               title="Chat baru"
-              className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#2f3033] text-[#e3e3e3] transition-colors hover:bg-[#3f4043]"
+              className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[var(--ami-bubble)] text-[var(--ami-text)] transition-colors hover:bg-[var(--ami-hover)]"
             >
               <Plus className="h-5 w-5" />
             </button>
@@ -203,7 +203,7 @@ export default function AmiSidebar(props: AmiSidebarProps) {
             <button
               type="button"
               onClick={props.onNewChat}
-              className="flex h-10 items-center gap-2 rounded-full bg-[#2f3033] px-4 text-sm text-[#e3e3e3] transition-colors hover:bg-[#3f4043]"
+              className="flex h-10 items-center gap-2 rounded-full bg-[var(--ami-bubble)] px-4 text-sm text-[var(--ami-text)] transition-colors hover:bg-[var(--ami-hover)]"
             >
               <Plus className="h-4 w-4" />
               Chat Baru
@@ -217,15 +217,15 @@ export default function AmiSidebar(props: AmiSidebarProps) {
             {loadingSessions && sessions.length === 0 ? (
               <div className="space-y-2 px-1 pt-4">
                 {[0, 1, 2].map((i) => (
-                  <div key={i} className="h-9 animate-pulse rounded-full bg-[#2f3033]/70" />
+                  <div key={i} className="h-9 animate-pulse rounded-full bg-[var(--ami-bubble)]/70" />
                 ))}
               </div>
             ) : sessions.length === 0 ? (
-              <p className="px-2 pt-6 text-center text-[13px] text-[#9aa0a6]">Belum ada riwayat</p>
+              <p className="px-2 pt-6 text-center text-[13px] text-[var(--ami-muted)]">Belum ada riwayat</p>
             ) : (
               groups.map((g) => (
                 <div key={g.label} className="pt-4">
-                  <p className="px-4 pb-1 text-[11px] font-medium uppercase tracking-wide text-[#9aa0a6]">
+                  <p className="px-4 pb-1 text-[11px] font-medium uppercase tracking-wide text-[var(--ami-muted)]">
                     {g.label}
                   </p>
                   <div className="space-y-0.5">
@@ -259,7 +259,7 @@ export default function AmiSidebar(props: AmiSidebarProps) {
               type="button"
               title={label}
               className={cn(
-                'flex w-full items-center gap-3 rounded-full py-2 text-sm text-[#c4c7c5] transition-colors hover:bg-[#2f3033]/70',
+                'flex w-full items-center gap-3 rounded-full py-2 text-sm text-[var(--ami-text2)] transition-colors hover:bg-[var(--ami-bubble)]/70',
                 collapsed ? 'justify-center px-0' : 'px-4',
               )}
             >
@@ -273,7 +273,7 @@ export default function AmiSidebar(props: AmiSidebarProps) {
             onClick={props.onCollapse}
             title={collapsed ? 'Expand' : 'Collapse'}
             className={cn(
-              'hidden w-full items-center gap-3 rounded-full py-2 text-sm text-[#c4c7c5] transition-colors hover:bg-[#2f3033]/70 md:flex',
+              'hidden w-full items-center gap-3 rounded-full py-2 text-sm text-[var(--ami-text2)] transition-colors hover:bg-[var(--ami-bubble)]/70 md:flex',
               collapsed ? 'justify-center px-0' : 'px-4',
             )}
           >
