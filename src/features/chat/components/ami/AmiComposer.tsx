@@ -1,9 +1,9 @@
 import { useRef } from 'react'
-import { ArrowUp, Mic, Plus, Square } from 'lucide-react'
+import { ArrowUp, Camera, Mic, Plus, Square } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import type { AmiChat } from '../../hooks/useAmiChat'
 
-export default function AmiComposer({ chat }: { chat: AmiChat }) {
+export default function AmiComposer({ chat, onFoto }: { chat: AmiChat; onFoto: () => void }) {
   const { input, setInput, isLoading, handleSend, stopStreaming } = chat
   const taRef = useRef<HTMLTextAreaElement>(null)
 
@@ -53,6 +53,14 @@ export default function AmiComposer({ chat }: { chat: AmiChat }) {
             placeholder="Tanyakan Ami"
             className="max-h-[200px] flex-1 resize-none bg-transparent py-2.5 text-[15px] leading-relaxed text-[#e3e3e3] outline-none placeholder:text-[#9aa0a6] disabled:opacity-50"
           />
+          <button
+            type="button"
+            title="Kirim foto ke paket"
+            onClick={onFoto}
+            className="rounded-full p-2.5 text-[#c4c7c5] transition-colors hover:bg-[#2f3033]"
+          >
+            <Camera className="h-5 w-5" />
+          </button>
           <button
             type="button"
             title="Input suara"

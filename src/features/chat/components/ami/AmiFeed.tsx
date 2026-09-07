@@ -3,8 +3,10 @@ import {
   Check,
   Copy,
   EllipsisVertical,
+  FileDown,
   Loader2,
   Pencil,
+  Printer,
   RotateCcw,
   Share2,
   Sparkles,
@@ -16,6 +18,29 @@ import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import { toast } from 'sonner'
 import type { AmiChat, AmiMessage } from '../../hooks/useAmiChat'
+import { ChatChart } from '../ChatChart'
+
+// Blok ```json {"type":"chart",...} dari jawaban AI → chart, teks lain dipertahankan.
+function extractCharts(content: string): Array<{ data: unknown; chart_type: string }> {
+  const charts: Array<{ data: unknown; chart_type: string }> = []
+  const blockRegex = /```json\n([\s\S]*?)\n```/g
+  let m: RegExpExecArray | null
+  while ((m = blockRegex.exec(content)) !== null) {
+    try {
+      const data = JSON.parse(m[1]) as { type?: string; chart_type?: string; data?: unknown }
+      if (data.type === 'chart' && Array.isArray(data.data)) {
+        charts.push({ data: data.data, chart_type: data.chart_type || 'bar' })
+      }
+    } catch {
+      /* blok invalid dilewati, teks dipertahankan */
+    }
+  }
+  return charts
+}
+
+function stripChartBlocks(content: string): string {
+  return content.replace(/```json\n[\s\S]*?\n```/g, '').trim()
+}
 
 const SUGGESTIONS = [
   { label: 'Detail kontrak paket', prompt: 'Tampilkan detail kontrak paket terbaru' },
@@ -178,8 +203,11 @@ function ModelBubble({ msg, chat }: { msg: AmiMessage; chat: AmiChat }) {
   const [voted, setVoted] = useState<'up' | 'down' | null>(null)
   const [menuOpen, setMenuOpen] = useState(false)
 
+  const charts = extractCharts(msg.content)
+  const displayText = charts.length > 0 ? stripChartBlocks(msg.content) : msg.content
+
   const copyText = () => {
-    navigator.clipboard.writeText(msg.content).then(
+    navigator.clipboard.writeText(displayText).then(
       () => {
         setCopied(true)
         setTimeout(() => setCopied(false), 1500)
@@ -211,16 +239,47 @@ function ModelBubble({ msg, chat }: { msg: AmiMessage; chat: AmiChat }) {
                 return <CodeBlock code={text.replace(/\n$/, '')} lang={match?.[1]} />
               },
               pre: ({ children }) => <>{children}</>,
-              a: ({ href, children }) => (
-                <a href={href} target="_blank" rel="noopener noreferrer" className="text-[#8ab4f8] hover:underline">
-                  {children}
-                </a>
-              ),
+              a: ({ href, children }) => {
+                const to = typeof href === 'string' ? href : ''
+                // Tautan laporan PDF dari tool AI → tombol unduh langsung.
+                if (/^\/chat\/reports\/download/.test(to)) {
+                  return (
+                    <button
+                      type="button"
+                      onClick={async () => {
+                        toast.info('Menyiapkan laporan PDF...')
+                        const { downloadBffPdf, buildBffApiUrl } = await import('@/lib/download-file')
+                        const err = await downloadBffPdf(buildBffApiUrl(to))
+                        if (err) toast.error(err)
+                        else toast.success('Laporan PDF terunduh')
+                      }}
+                      className="inline-flex items-center gap-1.5 rounded-full bg-[#2f3033] px-4 py-2 text-sm text-[#e3e3e3] transition-colors hover:bg-[#3f4043]"
+                    >
+                      <FileDown className="h-4 w-4" />
+                      {children}
+                    </button>
+                  )
+                }
+                return (
+                  <a href={href} target="_blank" rel="noopener noreferrer" className="text-[#8ab4f8] hover:underline">
+                    {children}
+                  </a>
+                )
+              },
             }}
           >
-            {msg.content}
+            {displayText}
           </ReactMarkdown>
         </div>
+
+        {charts.map((chart, idx) => (
+          <div key={idx} className="mt-3 w-full">
+            <ChatChart
+              data={chart.data as any[]}
+              type={chart.chart_type as 'bar' | 'pie' | 'line'}
+            />
+          </div>
+        ))}
 
         {msg.tool_calls && msg.tool_calls.length > 0 && (
           <p className="mt-2 flex items-center gap-1.5 text-xs text-[#9aa0a6]">
@@ -262,6 +321,21 @@ function ModelBubble({ msg, chat }: { msg: AmiMessage; chat: AmiChat }) {
               className="rounded-full p-2 text-[#9aa0a6] transition-colors hover:bg-[#2f3033] hover:text-white"
             >
               {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
+            </button>
+            <button
+              type="button"
+              title="Unduh PDF (kop Disperkim)"
+              onClick={async () => {
+                try {
+                  const { exportAnswerPdf } = await import('../../lib/export-answer-pdf')
+                  await exportAnswerPdf(displayText, 'Tanya AMI')
+                } catch {
+                  toast.error('Gagal membuat PDF')
+                }
+              }}
+              className="rounded-full p-2 text-[#9aa0a6] transition-colors hover:bg-[#2f3033] hover:text-white"
+            >
+              <Printer className="h-4 w-4" />
             </button>
             <div className="relative">
               <button

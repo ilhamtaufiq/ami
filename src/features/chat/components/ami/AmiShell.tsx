@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { Suspense, lazy, useState } from 'react'
 import { toast } from 'sonner'
 import { useAmiChat } from '../../hooks/useAmiChat'
 import AmiSidebar from './AmiSidebar'
@@ -7,11 +7,14 @@ import AmiFeed from './AmiFeed'
 import AmiComposer from './AmiComposer'
 import { setToken } from '@/lib/api-client'
 
+const ChatFotoUploadDialog = lazy(() => import('../ChatFotoUpload'))
+
 export default function AmiShell() {
   const chat = useAmiChat()
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [collapsed, setCollapsed] = useState(false)
   const [renamed, setRenamed] = useState<Record<number, string>>({})
+  const [fotoUploadOpen, setFotoUploadOpen] = useState(false)
 
   const sessions = chat.sessions.map((s) => (renamed[s.id] ? { ...s, title: renamed[s.id] } : s))
 
@@ -67,8 +70,13 @@ export default function AmiShell() {
         >
           <AmiFeed chat={{ ...chat, sessions }} />
         </div>
-        <AmiComposer chat={chat} />
+        <AmiComposer chat={chat} onFoto={() => setFotoUploadOpen(true)} />
       </main>
+      {fotoUploadOpen && (
+        <Suspense fallback={null}>
+          <ChatFotoUploadDialog open={fotoUploadOpen} onClose={() => setFotoUploadOpen(false)} />
+        </Suspense>
+      )}
     </div>
   )
 }
