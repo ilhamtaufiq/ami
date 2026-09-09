@@ -8,7 +8,8 @@ export function bunSignInUrl(next?: string): string {
 }
 
 export function amiLoginUrl(): string {
-  return `${window.location.origin}${window.location.pathname}#/login`
+  // Path asli (bukan #/login) — bun buildExternalAppCallbackUrl menaruh code+redirect di sini.
+  return `${window.location.origin}/auth/callback`
 }
 
 export function getHandoffCode(): string | null {

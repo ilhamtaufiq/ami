@@ -1,0 +1,4 @@
+/* SPA fallback — /auth/callback?code=… dari SSO bun harus sampai ke app, bukan 404 CF. */
+/auth/callback   /index.html   200
+/login           /index.html   200
+/*               /index.html   200
