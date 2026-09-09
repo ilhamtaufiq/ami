@@ -1,8 +1,10 @@
 # Cloudflare Pages — frontend static (Vite React SPA, package manager: bun)
-# Deploy: bunx wrangler pages deploy dist
+# Deploy manual: bunx wrangler pages deploy dist
 name = "ami-asisten"
-pages_build_output_dir = "dist"
 compatibility_date = "2025-01-01"
+
+[assets]
+directory = "./dist"
 
 # Build-time env (di-inline Vite via import.meta.env.VITE_*)
 # Set di dashboard CF Pages > Settings > Environment variables (Production):
