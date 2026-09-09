@@ -2,7 +2,7 @@
 @import './theme.css';
 @import './ami.css';
 
-@custom-variant dark (&:is(.dark *));
+@custom-variant dark (&:is(.dark *, .ami-dark *));
 
 @layer base {
   * {

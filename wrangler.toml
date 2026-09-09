@@ -1,0 +1,16 @@
+# Cloudflare Pages — frontend static (Vite React SPA)
+# Deploy: bunx wrangler pages deploy dist
+name = "ami-asisten"
+pages_build_output_dir = "dist"
+compatibility_date = "2025-01-01"
+
+# Build-time env (di-inline Vite via import.meta.env.VITE_*)
+# Set di dashboard CF Pages > Settings > Environment variables,
+# ATAU lewat file .env.production saat build lokal:
+#   VITE_APIAMIS_BASE_URL=https://apiamis.cianjur.space/api
+#   VITE_BUN_URL=https://<domain-portal-arumanis>
+#
+# Catatan: vars di bawah ini hanya dipakai build; tidak di-runtime.
+#[vars]
+#VITE_APIAMIS_BASE_URL = "https://apiamis.cianjur.space/api"
+#VITE_BUN_URL = "https://portal.arumanis.id"
