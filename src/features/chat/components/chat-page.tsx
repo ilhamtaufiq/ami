@@ -9,6 +9,7 @@ import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import { ChatChart } from './ChatChart'
 import { downloadBffPdf, buildBffApiUrl } from '@/lib/download-file'
+import { BUN_URL } from '@/lib/sso'
 
 const ChatFotoUploadDialog = lazy(() => import('./ChatFotoUpload'))
 
@@ -1065,7 +1066,9 @@ export default function ChatPage() {
                                                                     </button>
                                                                 )
                                                             }
-                                                            return <a href={to} className="text-primary hover:underline" target="_blank" rel="noopener noreferrer" {...props}>{children}</a>
+                                                            // Path relative (mis. /pekerjaan/632) = halaman arumanis, bukan AMI.
+                                                            const url = /^https?:\/\//.test(to) ? to : `${BUN_URL}${to}`
+                                                            return <a href={url} className="text-primary hover:underline" target="_blank" rel="noopener noreferrer" {...props}>{children}</a>
                                                         },
                                                         img: ({ src, ...props }) => (
                                                             // eslint-disable-next-line jsx-a11y/alt-text, jsx-a11y/click-events-have-key-events, jsx-a11y/no-noninteractive-element-interactions

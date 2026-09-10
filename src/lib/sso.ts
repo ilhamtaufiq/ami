@@ -1,6 +1,6 @@
 import api, { apiBaseUrl } from './api-client'
 
-const BUN_URL = (import.meta.env.VITE_BUN_URL ?? 'http://localhost:5173').replace(/\/$/, '')
+export const BUN_URL = (import.meta.env.VITE_BUN_URL ?? 'http://localhost:5173').replace(/\/$/, '')
 
 export function bunSignInUrl(next?: string): string {
   const url = `${BUN_URL}/sign-in`
