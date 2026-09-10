@@ -293,17 +293,17 @@ function ModelBubble({
                 ) : null,
               a: ({ href, children }) => {
                 const to = typeof href === 'string' ? href : ''
-                // Tautan laporan PDF dari tool AI → tombol unduh langsung.
-                if (/^\/chat\/reports\/download/.test(to)) {
+                // Endpoint unduh binary dari tool AI (laporan PDF, cover/kontrak DOCX) → tombol unduh BFF.
+                if (/^\/(chat\/reports\/download|kontrak\/\d+\/export)/.test(to)) {
                   return (
                     <button
                       type="button"
                       onClick={async () => {
-                        toast.info('Menyiapkan laporan PDF...')
+                        toast.info('Menyiapkan unduhan...')
                         const { downloadBffPdf, buildBffApiUrl } = await import('@/lib/download-file')
                         const err = await downloadBffPdf(buildBffApiUrl(to))
                         if (err) toast.error(err)
-                        else toast.success('Laporan PDF terunduh')
+                        else toast.success('Berkas terunduh')
                       }}
                       className="inline-flex items-center gap-1.5 rounded-full bg-[var(--ami-bubble)] px-4 py-2 text-sm text-[var(--ami-text)] transition-colors hover:bg-[var(--ami-hover)]"
                     >
