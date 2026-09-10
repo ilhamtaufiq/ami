@@ -18,6 +18,7 @@ import {
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import { toast } from 'sonner'
+import { BUN_URL } from '@/lib/sso'
 import type { AmiChat, AmiMessage } from '../../hooks/useAmiChat'
 import { suggestFollowUps } from '../../hooks/useAmiChat'
 import { ChatChart } from '../ChatChart'
@@ -311,8 +312,10 @@ function ModelBubble({
                     </button>
                   )
                 }
+                // Path relative (mis. /pekerjaan/632) = halaman arumanis, bukan AMI.
+                const url = /^https?:\/\//.test(to) ? to : `${BUN_URL}${to}`
                 return (
-                  <a href={href} target="_blank" rel="noopener noreferrer" className="text-[var(--ami-link)] hover:underline">
+                  <a href={url} target="_blank" rel="noopener noreferrer" className="text-[var(--ami-link)] hover:underline">
                     {children}
                   </a>
                 )
