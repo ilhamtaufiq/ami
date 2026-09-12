@@ -297,7 +297,7 @@ export function useAmiChat() {
       const raw = override ?? input
       if (!raw.trim() || isLoading) return
       const outgoing = raw.trim()
-      const historySnapshot = messages.slice(-10)
+      const historySnapshot = messages.slice(-20)
       setMessages((prev) => [...prev, { role: 'user', content: outgoing }])
       setInput('')
       setIsLoading(true)
