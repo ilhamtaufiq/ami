@@ -138,6 +138,7 @@ export function useAmiChat() {
   const [statusMessage, setStatusMessage] = useState<string | null>(null)
   const [toolTrace, setToolTrace] = useState<string[]>([])
   const [provider, setProvider] = useState<string>(() => localStorage.getItem('ami_provider') ?? 'local')
+  const [model, setModel] = useState<string | null>(() => localStorage.getItem('ami_model'))
   const [currentModel, setCurrentModel] = useState<string | null>(() => localStorage.getItem('ami_last_model'))
   const [userName, setUserName] = useState<string | null>(null)
   const abortRef = useRef<AbortController | null>(null)
@@ -285,6 +286,12 @@ export function useAmiChat() {
     localStorage.setItem('ami_provider', value)
   }, [])
 
+  const setModelAndSave = useCallback((value: string | null) => {
+    setModel(value)
+    if (value) localStorage.setItem('ami_model', value)
+    else localStorage.removeItem('ami_model')
+  }, [])
+
   const handleSend = useCallback(
     async (override?: string) => {
       const raw = override ?? input
@@ -359,7 +366,7 @@ export function useAmiChat() {
 
       try {
         const result = await streamChat(
-          { message: outgoing, session_id: activeSessionId, history: historySnapshot, provider },
+          { message: outgoing, session_id: activeSessionId, history: historySnapshot, provider, model },
           onEvent,
           controller.signal,
         )
@@ -369,6 +376,7 @@ export function useAmiChat() {
             session_id: activeSessionId,
             history: historySnapshot,
             provider,
+            model,
           })
           if (!fallback.success || !fallback.reply?.trim()) throw new Error(fallback.message || 'Chat gagal.')
           setMessages((prev) => {
@@ -417,7 +425,7 @@ export function useAmiChat() {
         if (abortRef.current === controller) abortRef.current = null
       }
     },
-    [input, isLoading, messages, activeSessionId, provider, fetchSessions],
+    [input, isLoading, messages, activeSessionId, provider, model, fetchSessions],
   )
 
   const regenerateLast = useCallback(() => {
@@ -463,6 +471,8 @@ export function useAmiChat() {
     toolTrace,
     provider,
     setProvider: setProviderAndSave,
+    model,
+    setModel: setModelAndSave,
     currentModel,
     userName,
     scrollRef,

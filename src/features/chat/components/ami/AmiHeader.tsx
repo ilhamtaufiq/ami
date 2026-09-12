@@ -8,6 +8,8 @@ import { AMI_PROVIDERS, type SessionTotals } from '../../hooks/useAmiChat'
 interface AmiHeaderProps {
   provider: string
   onProvider: (value: string) => void
+  model: string | null
+  onModel: (value: string | null) => void
   userName: string | null
   totals: SessionTotals
   theme: 'dark' | 'light'
@@ -16,16 +18,38 @@ interface AmiHeaderProps {
   onLogout: () => void
 }
 
+interface AiModelInfo {
+  id: string
+  available: boolean
+  min_tier?: string | null
+}
+
 function formatIdr(value: number): string {
   return 'Rp' + value.toLocaleString('id-ID', { maximumFractionDigits: 2 })
 }
 
-export default function AmiHeader({ provider, onProvider, userName, totals, theme, onToggleTheme, onMenu, onLogout }: AmiHeaderProps) {
+export default function AmiHeader({ provider, onProvider, model, onModel, userName, totals, theme, onToggleTheme, onMenu, onLogout }: AmiHeaderProps) {
   const [open, setOpen] = useState(false)
+  const [modelOpen, setModelOpen] = useState(false)
+  const [models, setModels] = useState<AiModelInfo[]>([])
+  const [modelsLoading, setModelsLoading] = useState(false)
   const [userOpen, setUserOpen] = useState(false)
   const [passOpen, setPassOpen] = useState(false)
   const [newPass, setNewPass] = useState('')
   const [passLoading, setPassLoading] = useState(false)
+
+  const fetchModels = async () => {
+    setModelsLoading(true)
+    try {
+      const res = await api.get<{ models?: AiModelInfo[] }>('/chat/models')
+      setModels(res.models ?? [])
+      if (!res.models?.length) toast.error('Tak ada model tersedia')
+    } catch {
+      toast.error('Gagal memuat daftar model')
+    } finally {
+      setModelsLoading(false)
+    }
+  }
 
   const changePassword = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -89,6 +113,57 @@ export default function AmiHeader({ provider, onProvider, userName, totals, them
                     <span className="block text-xs text-[var(--ami-muted)]">{p.hint}</span>
                   </span>
                   {p.value === provider && <Check className="h-4 w-4 text-[var(--ami-text)]" />}
+                </button>
+              ))}
+            </div>
+          </>
+        )}
+      </div>
+
+      {/* switcher model */}
+      <div className="relative">
+        <button
+          type="button"
+          onClick={() => {
+            setModelOpen((v) => !v)
+            if (!modelOpen && models.length === 0) fetchModels()
+          }}
+          className="flex items-center gap-1.5 rounded-full px-3 py-2 text-[15px] text-[var(--ami-text)] transition-colors hover:bg-[var(--ami-bubble)]"
+        >
+          <span className="max-w-[140px] truncate text-sm">{model ? model.split('/').pop() : 'Model'}</span>
+          <ChevronDown className={cn('h-4 w-4 text-[var(--ami-muted)] transition-transform', modelOpen && 'rotate-180')} />
+        </button>
+        {modelOpen && (
+          <>
+            <div className="fixed inset-0 z-30" onClick={() => setModelOpen(false)} />
+            <div className="absolute left-0 top-full z-40 mt-1 max-h-80 w-72 overflow-y-auto rounded-2xl bg-[var(--ami-bubble)] py-1.5 shadow-xl">
+              <button
+                type="button"
+                onClick={() => {
+                  onModel(null)
+                  setModelOpen(false)
+                }}
+                className="flex w-full items-center gap-3 px-4 py-2.5 text-left transition-colors hover:bg-[var(--ami-hover)]"
+              >
+                <span className="flex-1 text-sm text-[var(--ami-text)]">Default (pengaturan)</span>
+                {model === null && <Check className="h-4 w-4 text-[var(--ami-text)]" />}
+              </button>
+              {modelsLoading && (
+                <p className="px-4 py-2 text-xs text-[var(--ami-muted)]">Memuat model...</p>
+              )}
+              {models.map((m) => (
+                <button
+                  key={m.id}
+                  type="button"
+                  onClick={() => {
+                    onModel(m.id)
+                    setModelOpen(false)
+                  }}
+                  className="flex w-full items-center gap-3 px-4 py-2.5 text-left transition-colors hover:bg-[var(--ami-hover)]"
+                >
+                  <span className="flex-1 truncate text-sm text-[var(--ami-text)]">{m.id}</span>
+                  {!m.available && <span className="text-xs text-[var(--ami-muted)]">pro</span>}
+                  {m.id === model && <Check className="h-4 w-4 text-[var(--ami-text)]" />}
                 </button>
               ))}
             </div>

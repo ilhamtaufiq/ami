@@ -12,6 +12,7 @@ export interface StreamChatParams {
     session_id: number | null;
     history: Array<{ role: 'user' | 'assistant'; content: string }>;
     provider: string;
+    model?: string | null;
 }
 
 export type StreamChatResult = {

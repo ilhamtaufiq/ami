@@ -58,6 +58,8 @@ export default function AmiShell({
         <AmiHeader
           provider={chat.provider}
           onProvider={chat.setProvider}
+          model={chat.model}
+          onModel={chat.setModel}
           userName={chat.userName}
           totals={chat.totals}
           theme={theme}
